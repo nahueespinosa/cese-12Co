@@ -5,8 +5,8 @@
 
 /*=====[Avoid multiple inclusion - begin]====================================*/
 
-#ifndef __EJ1-CLASE1_H__
-#define __EJ1-CLASE1_H__
+#ifndef __EJ1_CLASE1_H__
+#define __EJ1_CLASE1_H__
 
 /*=====[Inclusions of public function dependencies]==========================*/
 
@@ -37,4 +37,4 @@ extern "C" {
 
 /*=====[Avoid multiple inclusion - end]======================================*/
 
-#endif /* __EJ1-CLASE1_H__ */
+#endif /* __EJ1_CLASE1_H__ */
