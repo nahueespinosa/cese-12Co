@@ -48,7 +48,7 @@ int main( void )
 
     // ----- Repeat for ever -------------------------
     while( true ) {
-    // ----- State Machine -----------------------
+        // ----- State Machine -----------------------
         switch(estado) {
             case SECUENCIA_DIRECTA:
                 if( delayRead( &tiempo_encendido ) ) {
