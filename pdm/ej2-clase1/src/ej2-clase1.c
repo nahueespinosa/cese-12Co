@@ -1,6 +1,20 @@
 /*=============================================================================
  * Author: Nahuel Espinosa <nahue.espinosa@gmail.com>
  * Date: 2020/06/25
+ *
+ * Resumen: Prender secuencialmente los leds de la placa LED1, LED2, LED3, LEDB
+ *
+ * Condiciones de funcionamiento
+ * - Una vez que se pasa al siguiente led los demás deberán apagarse.
+ * - Utilizar solamente LED azul de los leds RGB
+ * - Controlar el sentido de la secuencia con los botones TEC1 y TEC4:
+ *     - Inicialmente la secuencia es LEDB->LED1->LED2->LED3->LEDA...
+ *     - Al presionar TEC4 la secuencia se recorre en sentido inverso, esto es:
+ *     LED3->LED2->LED1->LEDA->LED3...
+ *     - Al presionar TEC1 la secuencia vuelve al orden inicial.
+ * - Al presionar TEC2 cada led queda encendido 150 ms.
+ * - Al presionar TEC3 cada led queda encendido 750 ms.
+ *
  *===========================================================================*/
 
 /*=====[Inclusions of function dependencies]=================================*/
