@@ -1,6 +1,17 @@
 /*=============================================================================
  * Author: Nahuel Espinosa <nahue.espinosa@gmail.com>
  * Date: 2020/06/25
+ *
+ * Description:
+ *    El programa espera a que un botón sea pulsado. Mientras el botón está
+ *    pulsado, se mide el tiempo utilizando un contador hasta que el botón es
+ *    liberado. En ese momento, se enciende el led asociado al botón durante
+ *    el tiempo calculado.
+ *
+ *          TEC1 -> LED1
+ *          TEC2 -> LED2
+ *          TEC3 -> LED3
+ *
  *===========================================================================*/
 
 /*=====[Inclusions of function dependencies]=================================*/
