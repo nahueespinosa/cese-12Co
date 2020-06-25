@@ -20,6 +20,11 @@
 #include "sapi.h"
 
 /*=====[Definition macros of private constants]==============================*/
+typedef enum {
+   IDLE,
+   TEC_PRESSED,
+   LED_ON
+} fsmStatus_t;
 
 /*=====[Definitions of extern global variables]==============================*/
 
@@ -31,13 +36,51 @@
 
 int main( void )
 {
+   uint8_t  current_idx;                        // Current index of pressed button
+   uint32_t tick_counter;                       // Time ticks counter (1 ms)
+
+   gpioMap_t   buttons[] = {TEC1, TEC2, TEC3};  // Buttons to test
+   gpioMap_t   leds[]    = {LED1, LED2, LED3};  // Leds to turn on for each button
+   fsmStatus_t status    = IDLE;
+
    // ----- Setup -----------------------------------
    boardInit();
 
    // ----- Repeat for ever -------------------------
    while( true ) {
-      gpioToggle(LED);
-      delay(500);
+
+      // ----- Finite State Machine --------------------
+      switch(status) {
+         case IDLE:
+            for( current_idx = 0 ; current_idx < sizeof(buttons) ; current_idx++ ) {
+               if( !gpioRead(buttons[current_idx]) && current_idx < sizeof(leds)) {
+                  status = TEC_PRESSED;
+                  tick_counter = 0;
+                  break;
+               }
+            }
+            break;
+
+         case TEC_PRESSED:
+            if( !gpioRead(buttons[current_idx]) ) {
+               tick_counter++;
+            } else {
+               status = LED_ON;
+            }
+            break;
+
+         case LED_ON:
+            if( tick_counter > 0 ) {
+               tick_counter--;
+               gpioWrite(leds[current_idx], ON);
+            } else {
+               gpioWrite(leds[current_idx], OFF);
+               status = IDLE;
+            }
+            break;
+      }
+
+      delay(1);   // Time ticks delay (1 ms)
    }
 
    // YOU NEVER REACH HERE, because this program runs directly or on a
