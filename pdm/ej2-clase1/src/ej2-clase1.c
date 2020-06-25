@@ -4,7 +4,7 @@
  *
  * Resumen: Prender secuencialmente los leds de la placa LED1, LED2, LED3, LEDB
  *
- * Condiciones de funcionamiento
+ * Condiciones de funcionamiento:
  * - Una vez que se pasa al siguiente led los demás deberán apagarse.
  * - Utilizar solamente LED azul de los leds RGB
  * - Controlar el sentido de la secuencia con los botones TEC1 y TEC4:
@@ -23,6 +23,10 @@
 #include "sapi.h"
 
 /*=====[Definition macros of private constants]==============================*/
+#define TIEMPO_OPCION_1    150
+#define TIEMPO_OPCION_2    750
+
+typedef enum {SECUENCIA_DIRECTA, SECUENCIA_INVERSA} fsmStatus_t;
 
 /*=====[Definitions of extern global variables]==============================*/
 
@@ -34,13 +38,50 @@
 
 int main( void )
 {
+   uint8_t paso = 0;
+   fsmStatus_t estado = SECUENCIA_DIRECTA;
+   gpioMap_t secuencia[]  = {LEDB, LED1, LED2, LED3};
+   delay_t tiempo_encendido;
+
    // ----- Setup -----------------------------------
    boardInit();
+   delayInit( &tiempo_encendido, TIEMPO_OPCION_1 );
 
    // ----- Repeat for ever -------------------------
    while( true ) {
-      gpioToggle(LED);
-      delay(500);
+       // ----- State Machine -----------------------
+       switch(estado) {
+           case SECUENCIA_DIRECTA:
+               if( delayRead( &tiempo_encendido ) ) {
+               gpioWrite(secuencia[paso], OFF);
+               paso++;
+               if( paso == sizeof(secuencia) ) paso = 0;
+               gpioWrite(secuencia[paso], ON);
+               }
+           break;
+           case SECUENCIA_INVERSA:
+               if( delayRead( &tiempo_encendido ) ) {
+               gpioWrite(secuencia[paso], OFF);
+               if( paso == 0 ) paso = sizeof(secuencia);
+               paso--;
+               gpioWrite(secuencia[paso], ON);
+               }
+           break;
+       }
+
+       // ----- Inputs ------------------------------
+       if( !gpioRead(TEC1) ) {
+           estado = SECUENCIA_DIRECTA;
+       }
+       if( !gpioRead(TEC4) ) {
+           estado = SECUENCIA_INVERSA;
+       }
+       if( !gpioRead(TEC2) ) {
+           delayWrite( &tiempo_encendido, TIEMPO_OPCION_1 );
+       }
+       if( !gpioRead(TEC3) ) {
+           delayWrite( &tiempo_encendido, TIEMPO_OPCION_2 );
+       }
    }
 
    // YOU NEVER REACH HERE, because this program runs directly or on a
