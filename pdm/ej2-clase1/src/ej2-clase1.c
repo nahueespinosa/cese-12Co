@@ -23,10 +23,8 @@
 #include "sapi.h"
 
 /*=====[Definition macros of private constants]==============================*/
-#define TIEMPO_OPCION_1    150
-#define TIEMPO_OPCION_2    750
-
-typedef enum {SECUENCIA_DIRECTA, SECUENCIA_INVERSA} fsmStatus_t;
+#define TIEMPO_OPCION_1       150
+#define TIEMPO_OPCION_2       750
 
 /*=====[Definitions of extern global variables]==============================*/
 
@@ -39,48 +37,63 @@ typedef enum {SECUENCIA_DIRECTA, SECUENCIA_INVERSA} fsmStatus_t;
 int main( void )
 {
    uint8_t paso = 0;
-   fsmStatus_t estado = SECUENCIA_DIRECTA;
-   gpioMap_t secuencia[]  = {LEDB, LED1, LED2, LED3};
+
+   gpioMap_t secuencia1[] = {LEDB, LED1, LED2, LED3};
+   gpioMap_t secuencia2[] = {LED3, LED2, LED1, LEDB};
+   gpioMap_t secuencia3[] = {LEDB, LED2, LED1, LED3};
+   gpioMap_t secuencia4[] = {LEDB, LED1, LED3, LED2};
+
+   gpioMap_t * secuencias[]  = {
+      secuencia1, secuencia2, secuencia3, secuencia4, NULL
+   };
+
+   gpioMap_t ** ptr_secuencia = secuencias;
+
    delay_t tiempo_encendido;
 
    // ----- Setup -----------------------------------
    boardInit();
-   delayInit( &tiempo_encendido, TIEMPO_OPCION_1 );
+   delayInit(&tiempo_encendido, TIEMPO_OPCION_1);
 
    // ----- Repeat for ever -------------------------
    while( true ) {
-       // ----- State Machine -----------------------
-       switch(estado) {
-           case SECUENCIA_DIRECTA:
-               if( delayRead( &tiempo_encendido ) ) {
-               gpioWrite(secuencia[paso], OFF);
-               paso++;
-               if( paso == sizeof(secuencia) ) paso = 0;
-               gpioWrite(secuencia[paso], ON);
-               }
-           break;
-           case SECUENCIA_INVERSA:
-               if( delayRead( &tiempo_encendido ) ) {
-               gpioWrite(secuencia[paso], OFF);
-               if( paso == 0 ) paso = sizeof(secuencia);
-               paso--;
-               gpioWrite(secuencia[paso], ON);
-               }
-           break;
+
+       if( delayRead(&tiempo_encendido) ) {
+          gpioWrite((*ptr_secuencia)[paso], OFF);
+          paso++;
+          paso %= sizeof(secuencia1);
+          gpioWrite((*ptr_secuencia)[paso], ON);
        }
 
        // ----- Inputs ------------------------------
        if( !gpioRead(TEC1) ) {
-           estado = SECUENCIA_DIRECTA;
+          delay(40);
+
+          if( *(ptr_secuencia+1) != NULL ) {
+             ptr_secuencia++;
+          }
+
+          while(!gpioRead(TEC1));
+          delay(40);
        }
-       if( !gpioRead(TEC4) ) {
-           estado = SECUENCIA_INVERSA;
+
+       if( !gpioRead(TEC4) && ptr_secuencia > secuencias ) {
+          delay(40);
+
+          if( ptr_secuencia > secuencias ) {
+             ptr_secuencia--;
+          }
+
+          while(!gpioRead(TEC4));
+          delay(40);
        }
+
        if( !gpioRead(TEC2) ) {
-           delayWrite( &tiempo_encendido, TIEMPO_OPCION_1 );
+          delayWrite(&tiempo_encendido, TIEMPO_OPCION_1);
        }
+
        if( !gpioRead(TEC3) ) {
-           delayWrite( &tiempo_encendido, TIEMPO_OPCION_2 );
+          delayWrite(&tiempo_encendido, TIEMPO_OPCION_2);
        }
    }
 
