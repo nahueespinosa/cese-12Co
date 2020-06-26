@@ -23,8 +23,6 @@
 #include "sapi.h"
 
 /*=====[Definition macros of private constants]==============================*/
-#define TIEMPO_OPCION_1       150
-#define TIEMPO_OPCION_2       750
 
 /*=====[Definitions of extern global variables]==============================*/
 
@@ -46,19 +44,21 @@ int main( void )
    gpioMap_t * secuencias[]  = {
       secuencia1, secuencia2, secuencia3, secuencia4, NULL
    };
-
    gpioMap_t ** ptr_secuencia = secuencias;
 
-   delay_t tiempo_encendido;
+   uint32_t tiempoEncendido[] = {150, 300, 750, (uint32_t) NULL};
+   uint32_t * ptr_tiempo = tiempoEncendido;
+
+   delay_t delayEncendido;
 
    // ----- Setup -----------------------------------
    boardInit();
-   delayInit(&tiempo_encendido, TIEMPO_OPCION_1);
+   delayInit(&delayEncendido, *ptr_tiempo);
 
    // ----- Repeat for ever -------------------------
    while( true ) {
 
-       if( delayRead(&tiempo_encendido) ) {
+       if( delayRead(&delayEncendido) ) {
           gpioWrite((*ptr_secuencia)[paso], OFF);
           paso++;
           paso %= sizeof(secuencia1);
@@ -89,11 +89,27 @@ int main( void )
        }
 
        if( !gpioRead(TEC2) ) {
-          delayWrite(&tiempo_encendido, TIEMPO_OPCION_1);
+          delay(40);
+
+          if( (void *)*(ptr_tiempo+1) != NULL ) {
+             ptr_tiempo++;
+          }
+          delayWrite(&delayEncendido, *ptr_tiempo);
+
+          while(!gpioRead(TEC2));
+          delay(40);
        }
 
        if( !gpioRead(TEC3) ) {
-          delayWrite(&tiempo_encendido, TIEMPO_OPCION_2);
+          delay(40);
+
+          if( ptr_tiempo > tiempoEncendido ) {
+             ptr_tiempo--;
+          }
+          delayWrite(&delayEncendido, *ptr_tiempo);
+
+          while(!gpioRead(TEC3));
+          delay(40);
        }
    }
 
