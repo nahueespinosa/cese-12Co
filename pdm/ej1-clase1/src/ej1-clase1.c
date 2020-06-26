@@ -84,8 +84,8 @@ void ledButtonFSM( ledButton_t *ledButton ) {
          if( !gpioRead(ledButton->button) ) {
             ledButton->status = TEC_PRESSED;
             ledButton->ticks = 0;
-            break;
          }
+         break;
 
       case TEC_PRESSED:
          if( !gpioRead(ledButton->button) ) {
