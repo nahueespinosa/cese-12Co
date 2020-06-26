@@ -26,6 +26,15 @@ typedef enum {
    LED_ON
 } fsmStatus_t;
 
+typedef struct {
+   gpioMap_t   led;        // Led associated
+   gpioMap_t   button;     // Button associated
+   fsmStatus_t status;     // Current status
+   uint32_t    ticks;      // Current tick counter
+} ledButton_t;
+
+void ledButtonFSM( ledButton_t *ledButton );
+
 /*=====[Definitions of extern global variables]==============================*/
 
 /*=====[Definitions of public global variables]==============================*/
@@ -36,55 +45,65 @@ typedef enum {
 
 int main( void )
 {
-   uint8_t  current_idx;                        // Current index of pressed button
-   uint32_t tick_counter;                       // Time ticks counter (1 ms)
+   uint8_t i;
 
-   gpioMap_t   buttons[] = {TEC1, TEC2, TEC3};  // Buttons to test
-   gpioMap_t   leds[]    = {LED1, LED2, LED3};  // Leds to turn on for each button
-   fsmStatus_t status    = IDLE;
+   // led, button, status, ticks
+   ledButton_t ledButtons[] = {
+      {LED1, TEC1, IDLE, 0},
+      {LED2, TEC2, IDLE, 0},
+      {LED3, TEC3, IDLE, 0}
+   };
+
+   delay_t tickDelay;
 
    // ----- Setup -----------------------------------
    boardInit();
+   delayInit(&tickDelay, 1);   // Tick delay 1 ms
 
    // ----- Repeat for ever -------------------------
    while( true ) {
 
-      // ----- Finite State Machine --------------------
-      switch(status) {
-         case IDLE:
-            for( current_idx = 0 ; current_idx < sizeof(buttons) ; current_idx++ ) {
-               if( !gpioRead(buttons[current_idx]) && current_idx < sizeof(leds)) {
-                  status = TEC_PRESSED;
-                  tick_counter = 0;
-                  break;
-               }
-            }
-            break;
-
-         case TEC_PRESSED:
-            if( !gpioRead(buttons[current_idx]) ) {
-               tick_counter++;
-            } else {
-               status = LED_ON;
-            }
-            break;
-
-         case LED_ON:
-            if( tick_counter > 0 ) {
-               tick_counter--;
-               gpioWrite(leds[current_idx], ON);
-            } else {
-               gpioWrite(leds[current_idx], OFF);
-               status = IDLE;
-            }
-            break;
+      if( delayRead(&tickDelay) ) {
+         for( i = 0 ; i < sizeof(ledButtons) ; i++ ) {
+            ledButtonFSM(&ledButtons[i]);
+         }
       }
 
-      delay(1);   // Time ticks delay (1 ms)
    }
 
    // YOU NEVER REACH HERE, because this program runs directly or on a
    // microcontroller and is not called by any Operating System, as in the 
    // case of a PC program.
    return 0;
+}
+
+void ledButtonFSM( ledButton_t *ledButton ) {
+
+   switch( ledButton->status ) {
+      case IDLE:
+         if( !gpioRead(ledButton->button) ) {
+            ledButton->status = TEC_PRESSED;
+            ledButton->ticks = 0;
+            break;
+         }
+
+      case TEC_PRESSED:
+         if( !gpioRead(ledButton->button) ) {
+            ledButton->ticks++;
+         } else {
+            ledButton->status = LED_ON;
+         }
+         break;
+
+      case LED_ON:
+         if( ledButton->ticks > 0 ) {
+            ledButton->ticks--;
+            gpioWrite(ledButton->led, ON);
+         } else {
+            gpioWrite(ledButton->led, OFF);
+            ledButton->status = IDLE;
+         }
+         break;
+   }
+
 }
