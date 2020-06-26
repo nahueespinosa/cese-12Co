@@ -23,6 +23,8 @@
 #include "sapi.h"
 
 /*=====[Definition macros of private constants]==============================*/
+#define IS_NOT_LAST(ptr, arr)   (void *)*(ptr+1) != NULL
+#define IS_NOT_FIRST(ptr, arr)  arr != ptr
 
 /*=====[Definitions of extern global variables]==============================*/
 
@@ -69,46 +71,46 @@ int main( void )
        if( !gpioRead(TEC1) ) {
           delay(40);
 
-          if( *(ptr_secuencia+1) != NULL ) {
+          if( IS_NOT_LAST(ptr_secuencia, secuencias) ) {
              ptr_secuencia++;
           }
 
-          while(!gpioRead(TEC1));
+          while( !gpioRead(TEC1) );
           delay(40);
        }
 
-       if( !gpioRead(TEC4) && ptr_secuencia > secuencias ) {
+       if( !gpioRead(TEC4) ) {
           delay(40);
 
-          if( ptr_secuencia > secuencias ) {
+          if( IS_NOT_FIRST(ptr_secuencia, secuencias) ) {
              ptr_secuencia--;
           }
 
-          while(!gpioRead(TEC4));
+          while( !gpioRead(TEC4) );
           delay(40);
        }
 
        if( !gpioRead(TEC2) ) {
           delay(40);
 
-          if( (void *)*(ptr_tiempo+1) != NULL ) {
+          if( IS_NOT_LAST(ptr_tiempo, tiempoEncendido) ) {
              ptr_tiempo++;
+             delayWrite(&delayEncendido, *ptr_tiempo);
           }
-          delayWrite(&delayEncendido, *ptr_tiempo);
 
-          while(!gpioRead(TEC2));
+          while( !gpioRead(TEC2) );
           delay(40);
        }
 
        if( !gpioRead(TEC3) ) {
           delay(40);
 
-          if( ptr_tiempo > tiempoEncendido ) {
+          if( IS_NOT_FIRST(ptr_tiempo, tiempoEncendido) ) {
              ptr_tiempo--;
+             delayWrite(&delayEncendido, *ptr_tiempo);
           }
-          delayWrite(&delayEncendido, *ptr_tiempo);
 
-          while(!gpioRead(TEC3));
+          while( !gpioRead(TEC3) );
           delay(40);
        }
    }
