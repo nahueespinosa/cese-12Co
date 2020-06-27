@@ -1,0 +1,3 @@
+[submodule "gdp/plantilla-planificacion"]
+	path = gdp/plantilla-planificacion
+	url = https://github.com/nahueespinosa/plantilla-planificacion
