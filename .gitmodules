@@ -1,3 +1,6 @@
 [submodule "gdp/plantilla-planificacion"]
 	path = gdp/plantilla-planificacion
 	url = https://github.com/nahueespinosa/plantilla-planificacion
+[submodule "ids/tp1b"]
+	path = ids/tp1b
+	url = https://github.com/nahueespinosa/cese-ids-12Co-tp1b.git
