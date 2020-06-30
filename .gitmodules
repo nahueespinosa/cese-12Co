@@ -4,3 +4,6 @@
 [submodule "ids/tp1b"]
 	path = ids/tp1b
 	url = https://github.com/nahueespinosa/cese-ids-12Co-tp1b.git
+[submodule "ids/tp1a"]
+	path = ids/tp1a
+	url = https://github.com/cese-ids/cese-ids-12Co-tp1a.git
