@@ -13,3 +13,4 @@ Carpeta con ejercicios y entregables del curso de Ingeniería de Software de la 
 ## Docentes
 
 - Esp. Ing. Esteban Volentini
+- Esp. Ing. Alejandro Permingeat
