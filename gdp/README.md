@@ -15,4 +15,5 @@ Carpeta con ejercicios y entregables del curso de Gestión de Proyectos de la 12
 ## Docentes
 
 - Dr. Ing. Ariel Lutenberg
+- Esp. Ing. Alejandro Permingeat
 - Mg. Ing. Patricio Bos
