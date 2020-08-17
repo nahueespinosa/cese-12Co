@@ -103,8 +103,8 @@ void relayUpdate(void) {
       case RELAY_CT_2:
       case RELAY_FE_1:
       case RELAY_FE_2:
-         /* No se pueden detectar inconsistencias si la llave está
-          * deshabilitada porque estos relés se desactivan por hardware. */
+         /* Solo se pueden detectar inconsistencias si la llave está habilitada,
+          * porque de lo contrario estos relés se desactivan por hardware. */
          if( relayControlRead(i) != relayRead(i) && switchReadCurrent() == ON ) {
             relayConfig[i].errorCount++;
          } else {
