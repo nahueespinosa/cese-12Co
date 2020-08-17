@@ -61,6 +61,7 @@ void saltUpdate(void) {
       // Punto de entrada
       if( fsmEnabledFlag == false ) {
          safetyIsolatedModeEnable();
+         gpioWrite(LEDR, OFF);
          gpioWrite(LEDG, ON);
          fsmEnabledFlag = true;
       }
@@ -88,6 +89,7 @@ void saltUpdate(void) {
       if( fsmErrorFlag == false ) {
          safetyIsolatedModeDisable();
          gpioWrite(LEDR, ON);
+         gpioWrite(LEDG, OFF);
          fsmErrorFlag = true;
       }
 

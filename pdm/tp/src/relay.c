@@ -11,7 +11,7 @@
 /*=====[Definition macros of private constants]==============================*/
 
 //! Umbral de detección para inconsistencias en los relés
-#define RELAY_ERROR_THR    5
+#define RELAY_ERROR_THR    10
 
 /*=====[Definition macros of private constants]==============================*/
 
@@ -105,7 +105,7 @@ void relayUpdate(void) {
       case RELAY_FE_2:
          /* No se pueden detectar inconsistencias si la llave está
           * deshabilitada porque estos relés se desactivan por hardware. */
-         if( relayControlRead(i) != relayRead(i) && switchRead() == ON ) {
+         if( relayControlRead(i) != relayRead(i) && switchReadCurrent() == ON ) {
             relayConfig[i].errorCount++;
          } else {
             relayConfig[i].errorCount = 0;

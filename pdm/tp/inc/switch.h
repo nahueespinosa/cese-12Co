@@ -21,12 +21,20 @@ extern "C" {
 /*=====[Definition macros of public constants]===============================*/
 
 //! Intervalo de actualización del estado de la llave rotativa en milisegundos
-#define SWITCH_UPDATE_TIME    10
+#define SWITCH_UPDATE_TIME    20
 
 /*=====[Prototypes (declarations) of public functions]=======================*/
 
 //! Inicializar las entradas de la llave rotativa
 void switchInit(void);
+
+/**
+ * @brief Leer el estado actual del pin de la llave rotativa
+ *
+ * @return      ON       Si el pin está en estado bajo (activado)
+ * @return      OFF      Si el pin está en estado alto (desactivado)
+ */
+bool_t switchReadCurrent(void);
 
 /**
  * @brief Leer el estado de la llave rotativa

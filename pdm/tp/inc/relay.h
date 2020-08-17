@@ -21,7 +21,7 @@ extern "C" {
 /*=====[Definition macros of public constants]===============================*/
 
 //! Intervalo de actualización del estado de los relés en milisegundos
-#define RELAY_UPDATE_TIME  10
+#define RELAY_UPDATE_TIME  20
 
 /*=====[Public function-like macros]=========================================*/
 
@@ -93,6 +93,7 @@ bool_t relayCheckAll(void);
  * Hay algunos relés que están acoplados eléctricamente a la llave rotativa,
  * en ese caso puede ocurrir que la llave esté deshabilitada y eso provoque
  * que el relé se desactive independientemente del valor del pin de control.
+ * En ese caso se ignoran esos errores.
  */
 void relayUpdate(void);
 

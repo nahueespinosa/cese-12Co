@@ -22,6 +22,9 @@ extern "C" {
 
 /*=====[Definition macros of public constants]===============================*/
 
+//! Intervalo de actualización del estado del SAL/T en milisegundos
+#define SALT_UPDATE_TIME  100
+
 /*=====[Public function-like macros]=========================================*/
 
 /*=====[Definitions of public data types]====================================*/

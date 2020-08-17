@@ -11,10 +11,10 @@
 /*=====[Definition macros of private constants]==============================*/
 
 //! GPIO de entrada de la llave rotativa
-#define SWITCH_GPIO  GPIO8
+#define SWITCH_GPIO           GPIO8
 
 //! Umbral de detección para el cambio de estado
-#define SWITCH_STATE_THR      5
+#define SWITCH_STATE_THR      20
 
 /*=====[Definitions of private global variables]=============================*/
 
@@ -27,6 +27,10 @@ void switchInit(void) {
    gpioConfig(SWITCH_GPIO, GPIO_INPUT_PULLUP);
 }
 
+bool_t switchReadCurrent(void) {
+   return !gpioRead(SWITCH_GPIO);
+}
+
 bool_t switchRead(void) {
    return switchState;
 }
@@ -35,7 +39,7 @@ void switchUpdate(void) {
    static uint32_t stateCount = 0;
 
    if( switchState == OFF ) {
-      if( !gpioRead(SWITCH_GPIO) ) {
+      if( switchReadCurrent() ) {
          stateCount++;
 
          if( stateCount >= SWITCH_STATE_THR ) {
@@ -46,7 +50,7 @@ void switchUpdate(void) {
          stateCount = 0;
       }
    } else {
-      if( gpioRead(SWITCH_GPIO) ) {
+      if( !switchReadCurrent() ) {
          stateCount++;
 
          if( stateCount >= SWITCH_STATE_THR ) {
