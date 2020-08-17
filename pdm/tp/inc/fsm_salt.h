@@ -25,10 +25,6 @@ extern "C" {
 //! Intervalo de actualización del estado del SAL/T en milisegundos
 #define SALT_UPDATE_TIME  100
 
-/*=====[Public function-like macros]=========================================*/
-
-/*=====[Definitions of public data types]====================================*/
-
 /*=====[Prototypes (declarations) of public functions]=======================*/
 
 //! Inicializar los subcomponentes, relés y llave rotativa del módulo SAL/T.
@@ -36,8 +32,6 @@ void saltInit(void);
 
 //! Actualizar la máquina de estados del módulo SAL/T
 void saltUpdate(void);
-
-/*=====[Prototypes (declarations) of public interrupt functions]=============*/
 
 /*=====[C++ - end]===========================================================*/
 
