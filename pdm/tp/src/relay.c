@@ -88,26 +88,32 @@ void relayUpdate() {
    int i;
 
    for( i = 0 ; i < RELAY_NUM ; i++ ) {
-      if( relayControlRead(i) != relayRead(i) ) {
-         switch(i) {
-         case RELAY_CT_1:
-         case RELAY_CT_2:
-         case RELAY_FE_1:
-         case RELAY_FE_2:
-            /* No se pueden detectar inconsistencias si la llave está
-             * deshabilitada porque estos relés se desactivan por hardware. */
-            if( relayCheck(i) == TRUE && switchRead() == ON ) {
-               relayConfig[i].errorCount++;
-            }
-            break;
-         default:
-            if( relayCheck(i) == TRUE ) {
-               relayConfig[i].errorCount++;
-            }
-            break;
+      switch(i) {
+      case RELAY_CT_1:
+      case RELAY_CT_2:
+      case RELAY_FE_1:
+      case RELAY_FE_2:
+         /* No se pueden detectar inconsistencias si la llave está
+          * deshabilitada porque estos relés se desactivan por hardware. */
+         if( relayControlRead(i) != relayRead(i) && switchRead() == ON ) {
+            relayConfig[i].errorCount++;
+         } else {
+            relayConfig[i].errorCount = 0;
          }
-      } else {
-         relayConfig[i].errorCount = 0;
+         break;
+      default:
+         if( relayControlRead(i) != relayRead(i) ) {
+            relayConfig[i].errorCount++;
+         } else {
+            relayConfig[i].errorCount = 0;
+         }
+         break;
+      }
+
+      /* Si se supera el RELAY_ERROR_THR se deja al límite para que no
+       * desborde la variable. */
+      if( relayConfig[i].errorCount > RELAY_ERROR_THR ) {
+         relayConfig[i].errorCount = RELAY_ERROR_THR;
       }
    }
 }
