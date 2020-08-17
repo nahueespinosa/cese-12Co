@@ -58,7 +58,7 @@ void relayInit(void) {
    for( i = 0 ; i < RELAY_NUM ; i++ ) {
       gpioWrite(relayConfig[i].controlPin, OFF);
       gpioConfig(relayConfig[i].controlPin, GPIO_OUTPUT);
-      gpioConfig(relayConfig[i].statePin, GPIO_INPUT);
+      gpioConfig(relayConfig[i].statePin, GPIO_INPUT_PULLUP);
       relayConfig[i].errorCount = 0;
    }
 }
