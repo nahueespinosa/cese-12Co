@@ -28,8 +28,10 @@ int main( void )
 
    // ----- Repeat for ever -------------------------
    while( true ) {
+      relayUpdate();
+      switchUpdate();
       saltUpdate();
-      delay(100);
+      delay(10);
    }
 
    return 0;

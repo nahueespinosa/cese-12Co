@@ -32,18 +32,18 @@ void saltInit() {
 void saltUpdate() {
    static saltState_t state = DISABLED;
 
-   static bool_t fsmDisabledFlag = OFF;
-   static bool_t fsmEnabledFlag = OFF;
-   static bool_t fsmErrorFlag = OFF;
+   static bool_t fsmDisabledFlag = false;
+   static bool_t fsmEnabledFlag = false;
+   static bool_t fsmErrorFlag = false;
 
    switch(state) {
    case DISABLED:
       // Punto de entrada
-      if( fsmDisabledFlag == OFF ) {
+      if( fsmDisabledFlag == false ) {
          safetyIsolatedModeDisable();
          gpioWrite(LEDG, OFF);
          gpioWrite(LEDR, OFF);
-         fsmDisabledFlag = ON;
+         fsmDisabledFlag = true;
       }
 
       // Revisión de condiciones de transición
@@ -53,43 +53,42 @@ void saltUpdate() {
 
       // Punto de salida
       if( state != DISABLED ) {
-         fsmDisabledFlag = OFF;
+         fsmDisabledFlag = false;
       }
       break;
 
    case ENABLED:
       // Punto de entrada
-      if( fsmEnabledFlag == OFF ) {
+      if( fsmEnabledFlag == false ) {
          safetyIsolatedModeEnable();
          gpioWrite(LEDG, ON);
-         fsmEnabledFlag = ON;
+         fsmEnabledFlag = true;
       }
 
       // Revisión de condiciones de transición
-      relayUpdate();
-
       if( relayCheckAll() == FALSE ) {
          state = ERROR_STATE;
       }
 
-      switchUpdate();
-
+      /* La transición al estado deshabilitado tiene más prioridad que la
+       * detección de un error en los relés porque los mismos se desactivan
+       * por hardware y en ese punto no se pueden detectar inconsistencias. */
       if( switchRead() == OFF ) {
          state = DISABLED;
       }
 
       // Punto de salida
       if( state != ENABLED ) {
-         fsmEnabledFlag = OFF;
+         fsmEnabledFlag = false;
       }
       break;
 
    case ERROR_STATE:
       // Punto de entrada
-      if( fsmErrorFlag == OFF ) {
+      if( fsmErrorFlag == false ) {
          safetyIsolatedModeDisable();
          gpioWrite(LEDR, ON);
-         fsmErrorFlag = ON;
+         fsmErrorFlag = true;
       }
 
       // Revisión de condiciones de transición
@@ -99,9 +98,10 @@ void saltUpdate() {
 
       // Punto de salida
       if( state != ERROR_STATE ) {
-         fsmErrorFlag = OFF;
+         fsmErrorFlag = false;
       }
       break;
+
    default:
       state = DISABLED;
       break;

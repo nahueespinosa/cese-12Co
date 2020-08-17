@@ -25,22 +25,22 @@ extern "C" {
 /*=====[Prototypes (declarations) of public functions]=======================*/
 
 //! Habilitar el modo aislado limitado
-void safetyIsolatedModeEnable();
+void safetyIsolatedModeEnable(void);
 
 //! Deshabilitar el modo aislado limitado
-void safetyIsolatedModeDisable();
+void safetyIsolatedModeDisable(void);
 
 //! Activar la señal de corte de tracción
-void safetySignalActivateCT();
+void safetySignalActivateCT(void);
 
 //! Desactivar la señal de corte de tracción
-void safetySignalDeactivateCT();
+void safetySignalDeactivateCT(void);
 
 //! Activar la señal de freno de emergencia
-void safetySignalActivateFE();
+void safetySignalActivateFE(void);
 
 //! Desactivar la señal de freno de emergencia
-void safetySignalDeactivateFE();
+void safetySignalDeactivateFE(void);
 
 /*=====[Prototypes (declarations) of public interrupt functions]=============*/
 

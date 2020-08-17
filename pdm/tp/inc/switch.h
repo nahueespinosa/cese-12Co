@@ -20,6 +20,9 @@ extern "C" {
 
 /*=====[Definition macros of public constants]===============================*/
 
+#define SWITCH_UPDATE_TIME    10
+#define SWITCH_STATE_THR      5
+
 /*=====[Public function-like macros]=========================================*/
 
 /*=====[Definitions of public data types]====================================*/

@@ -10,9 +10,7 @@
 
 /*=====[Definition macros of private constants]==============================*/
 
-#define SWITCH_GPIO_1         GPIO8
-#define SWITCH_GPIO_2         GPIO6    // ADC CH2
-#define SWITCH_STATE_THR      5
+#define SWITCH_GPIO  GPIO8
 
 /*=====[Definitions of extern global variables]==============================*/
 
@@ -27,8 +25,7 @@ static bool_t switchState = OFF;
 /*=====[Implementation of public functions]==================================*/
 
 void switchInit() {
-   gpioConfig(SWITCH_GPIO_1, GPIO_INPUT_PULLUP);
-   gpioConfig(SWITCH_GPIO_2, GPIO_INPUT_PULLUP);
+   gpioConfig(SWITCH_GPIO, GPIO_INPUT_PULLUP);
 }
 
 bool_t switchRead() {
@@ -39,7 +36,7 @@ void switchUpdate() {
    static uint32_t stateCount = 0;
 
    if( switchState == OFF ) {
-      if( !gpioRead(SWITCH_GPIO_1) && !gpioRead(SWITCH_GPIO_2) ) {
+      if( !gpioRead(SWITCH_GPIO) ) {
          stateCount++;
 
          if( stateCount >= SWITCH_STATE_THR ) {
@@ -50,7 +47,7 @@ void switchUpdate() {
          stateCount = 0;
       }
    } else {
-      if( gpioRead(SWITCH_GPIO_1) || gpioRead(SWITCH_GPIO_2) ) {
+      if( gpioRead(SWITCH_GPIO) ) {
          stateCount++;
 
          if( stateCount >= SWITCH_STATE_THR ) {

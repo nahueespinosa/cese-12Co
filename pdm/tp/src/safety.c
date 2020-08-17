@@ -22,7 +22,7 @@
 
 /*=====[Implementation of public functions]==================================*/
 
-void safetyIsolatedModeEnable() {
+void safetyIsolatedModeEnable(void) {
    relayWrite(RELAY_CT_1, ON);
    relayWrite(RELAY_CT_2, OFF);
    relayWrite(RELAY_CT_3, ON);
@@ -32,7 +32,7 @@ void safetyIsolatedModeEnable() {
    relayWrite(RELAY_FE_3, ON);
 }
 
-void safetyIsolatedModeDisable() {
+void safetyIsolatedModeDisable(void) {
    relayWrite(RELAY_CT_1, OFF);
    relayWrite(RELAY_CT_2, OFF);
    relayWrite(RELAY_CT_3, OFF);
@@ -42,25 +42,25 @@ void safetyIsolatedModeDisable() {
    relayWrite(RELAY_FE_3, OFF);
 }
 
-void safetySignalActivateCT() {
+void safetySignalActivateCT(void) {
    if( relayRead(RELAY_CT_1) && relayRead(RELAY_CT_3) ) {
       relayWrite(RELAY_CT_2, ON);
    }
 }
 
-void safetySignalDeactivateCT() {
+void safetySignalDeactivateCT(void) {
    if( relayRead(RELAY_CT_1) && relayRead(RELAY_CT_3) ) {
       relayWrite(RELAY_CT_2, OFF);
    }
 }
 
-void safetySignalActivateFE() {
+void safetySignalActivateFE(void) {
    if( relayRead(RELAY_FE_1) && relayRead(RELAY_FE_3) ) {
       relayWrite(RELAY_FE_2, ON);
    }
 }
 
-void safetySignalDeactivateFE() {
+void safetySignalDeactivateFE(void) {
    if( relayRead(RELAY_FE_1) && relayRead(RELAY_FE_3) ) {
       relayWrite(RELAY_FE_2, OFF);
    }

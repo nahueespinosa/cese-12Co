@@ -20,6 +20,9 @@ extern "C" {
 
 /*=====[Definition macros of public constants]===============================*/
 
+#define RELAY_UPDATE_TIME  10
+#define RELAY_ERROR_THR    5
+
 /*=====[Public function-like macros]=========================================*/
 
 /*=====[Definitions of public data types]====================================*/
@@ -35,6 +38,7 @@ typedef enum {
    RELAY_REG_2,
    RELAY_REG_3,
    RELAY_REG_4,
+   RELAY_NUM,
 } relay_t;
 
 typedef void (*relayCallback_t)(relay_t);
