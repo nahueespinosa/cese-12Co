@@ -20,7 +20,7 @@
 
 /*=====[Main function, program entry point after power on or reset]==========*/
 
-int main( void )
+int main(void)
 {
    // ----- Setup -----------------------------------
    boardInit();

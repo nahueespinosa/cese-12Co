@@ -1,6 +1,6 @@
 /*=============================================================================
  * Author: Nahuel Espinosa <nahue.espinosa@gmail.com>
- * Date: 2020/08/11
+ * Date: 2020/08/17
  *===========================================================================*/
 
 /*=====[Inclusions of function dependencies]=================================*/
@@ -10,29 +10,28 @@
 
 /*=====[Definition macros of private constants]==============================*/
 
+//! GPIO de entrada de la llave rotativa
 #define SWITCH_GPIO  GPIO8
 
-/*=====[Definitions of extern global variables]==============================*/
-
-/*=====[Definitions of public global variables]==============================*/
+//! Umbral de detección para el cambio de estado
+#define SWITCH_STATE_THR      5
 
 /*=====[Definitions of private global variables]=============================*/
 
+//! Variable interna de estado de la llave rotativa
 static bool_t switchState = OFF;
-
-/*=====[Prototypes (declarations) of private functions]======================*/
 
 /*=====[Implementation of public functions]==================================*/
 
-void switchInit() {
+void switchInit(void) {
    gpioConfig(SWITCH_GPIO, GPIO_INPUT_PULLUP);
 }
 
-bool_t switchRead() {
+bool_t switchRead(void) {
    return switchState;
 }
 
-void switchUpdate() {
+void switchUpdate(void) {
    static uint32_t stateCount = 0;
 
    if( switchState == OFF ) {
@@ -59,5 +58,3 @@ void switchUpdate() {
       }
    }
 }
-
-/*=====[Implementation of private functions]=================================*/

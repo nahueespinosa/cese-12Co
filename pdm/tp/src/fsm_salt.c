@@ -1,13 +1,13 @@
 /*=============================================================================
  * Author: Nahuel Espinosa <nahue.espinosa@gmail.com>
- * Date: 2020/08/11
+ * Date: 2020/08/17
  *===========================================================================*/
 
 /*=====[Inclusions of function dependencies]=================================*/
 
-#include "sapi.h"
-#include "safety.h"
 #include "fsm_salt.h"
+
+#include "sapi.h"
 
 /*=====[Definition macros of private constants]==============================*/
 
@@ -24,12 +24,12 @@ typedef enum {DISABLED, ENABLED, ERROR_STATE} saltState_t;
 
 /*=====[Implementation of public functions]==================================*/
 
-void saltInit() {
+void saltInit(void) {
    relayInit();
    switchInit();
 }
 
-void saltUpdate() {
+void saltUpdate(void) {
    static saltState_t state = DISABLED;
 
    static bool_t fsmDisabledFlag = false;

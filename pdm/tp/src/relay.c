@@ -1,6 +1,6 @@
 /*=============================================================================
  * Author: Nahuel Espinosa <nahue.espinosa@gmail.com>
- * Date: 2020/08/11
+ * Date: 2020/08/17
  *===========================================================================*/
 
 /*=====[Inclusions of function dependencies]=================================*/
@@ -10,18 +10,21 @@
 
 /*=====[Definition macros of private constants]==============================*/
 
+//! Umbral de detección para inconsistencias en los relés
+#define RELAY_ERROR_THR    5
+
+/*=====[Definition macros of private constants]==============================*/
+
+//! Estructura para almacenar los GPIO correspondientes a cada pin y su estado
 typedef struct {
    gpioMap_t controlPin;
    gpioMap_t statePin;
    uint32_t  errorCount;
 } relayConfig_t;
 
-/*=====[Definitions of extern global variables]==============================*/
-
-/*=====[Definitions of public global variables]==============================*/
-
 /*=====[Definitions of private global variables]=============================*/
 
+//! Vector que almacena configuración y el estado de cada relé
 static relayConfig_t relayConfig[RELAY_NUM] = {
 // {controlPin, statusPin, errorCount}
    {GPIO1     , GPIO7    , 0},    // RELAY_CT_1
@@ -38,11 +41,18 @@ static relayConfig_t relayConfig[RELAY_NUM] = {
 
 /*=====[Prototypes (declarations) of private functions]======================*/
 
+/**
+ * @brief Leer el valor del pin de control del relé
+ *
+ * @param[in]   relay    Identificador del relé
+ * @return      ON       El pin está en un estado lógico alto
+ * @return      OFF      El pin está en un estado lógico bajo
+ */
 static bool_t relayControlRead(relay_t relay);
 
 /*=====[Implementation of public functions]==================================*/
 
-void relayInit() {
+void relayInit(void) {
    int i;
 
    for( i = 0 ; i < RELAY_NUM ; i++ ) {
@@ -71,7 +81,7 @@ bool_t relayCheck(relay_t relay) {
    return retValue;
 }
 
-bool_t relayCheckAll() {
+bool_t relayCheckAll(void) {
    bool_t retValue = TRUE;
    int i;
 
@@ -84,7 +94,7 @@ bool_t relayCheckAll() {
    return retValue;
 }
 
-void relayUpdate() {
+void relayUpdate(void) {
    int i;
 
    for( i = 0 ; i < RELAY_NUM ; i++ ) {

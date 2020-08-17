@@ -1,6 +1,6 @@
 /*=============================================================================
  * Author: Nahuel Espinosa <nahue.espinosa@gmail.com>
- * Date: 2020/08/11
+ * Date: 2020/08/17
  *===========================================================================*/
 
 /*=====[Avoid multiple inclusion - begin]====================================*/
@@ -12,6 +12,7 @@
 
 #include "relay.h"
 #include "switch.h"
+#include "safety.h"
 
 /*=====[C++ - begin]=========================================================*/
 
@@ -28,10 +29,10 @@ extern "C" {
 /*=====[Prototypes (declarations) of public functions]=======================*/
 
 //! Inicializar los subcomponentes, relés y llave rotativa del módulo SAL/T.
-void saltInit();
+void saltInit(void);
 
 //! Actualizar la máquina de estados del módulo SAL/T
-void saltUpdate();
+void saltUpdate(void);
 
 /*=====[Prototypes (declarations) of public interrupt functions]=============*/
 

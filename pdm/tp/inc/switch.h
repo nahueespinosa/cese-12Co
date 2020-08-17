@@ -1,6 +1,6 @@
 /*=============================================================================
  * Author: Nahuel Espinosa <nahue.espinosa@gmail.com>
- * Date: 2020/08/11
+ * Date: 2020/08/17
  *===========================================================================*/
 
 /*=====[Avoid multiple inclusion - begin]====================================*/
@@ -20,25 +20,31 @@ extern "C" {
 
 /*=====[Definition macros of public constants]===============================*/
 
+//! Intervalo de actualización del estado de la llave rotativa en milisegundos
 #define SWITCH_UPDATE_TIME    10
-#define SWITCH_STATE_THR      5
-
-/*=====[Public function-like macros]=========================================*/
-
-/*=====[Definitions of public data types]====================================*/
 
 /*=====[Prototypes (declarations) of public functions]=======================*/
 
 //! Inicializar las entradas de la llave rotativa
-void   switchInit();
+void switchInit(void);
 
-//! Leer el estado de la llave rotativa
-bool_t switchRead();
+/**
+ * @brief Leer el estado de la llave rotativa
+ *
+ * @return      ON       Si la llave está en estado activado
+ * @return      OFF      Si la llave está en estado desactivado
+ */
+bool_t switchRead(void);
 
-//! Actualizar el estado de la llave rotativa
-void   switchUpdate();
-
-/*=====[Prototypes (declarations) of public interrupt functions]=============*/
+/**
+ * @brief Actualizar el estado de la llave rotativa
+ *
+ * Debe llamarse en intervalos de tiempo constantes (SWITCH_UPDATE_TIME).
+ * Lee el estado del pin SWITCH_GPIO y si se mantiene estable durante una
+ * determinada cantidad de lecturas (SWITCH_STATE_THR) actualiza el estado
+ * de la llave al nuevo estado.
+ */
+void switchUpdate(void);
 
 /*=====[C++ - end]===========================================================*/
 
