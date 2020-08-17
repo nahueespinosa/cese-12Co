@@ -29,9 +29,9 @@ int main(void)
    schedulerInit();
 
    // Se agregan las tareas al planificador
-   schedulerAddTask( saltUpdate  , NULL, 0, SALT_UPDATE_TIME   );
-   schedulerAddTask( relayUpdate , NULL, 1, RELAY_UPDATE_TIME  );
-   schedulerAddTask( switchUpdate, NULL, 2, SWITCH_UPDATE_TIME );
+   schedulerAddTask( (callBackFuncPtr_t)saltUpdate  , NULL, 0, SALT_UPDATE_TIME   );
+   schedulerAddTask( (callBackFuncPtr_t)relayUpdate , NULL, 1, RELAY_UPDATE_TIME  );
+   schedulerAddTask( (callBackFuncPtr_t)switchUpdate, NULL, 2, SWITCH_UPDATE_TIME );
 
    // FUNCION que inicializa la interrupcion que ejecuta el planificador de
    // tareas con tick cada 1ms.
