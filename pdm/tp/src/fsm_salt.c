@@ -14,14 +14,6 @@
 //! Definición de estados del módulo SAL/T
 typedef enum {DISABLED, ENABLED, ERROR_STATE} saltState_t;
 
-/*=====[Definitions of extern global variables]==============================*/
-
-/*=====[Definitions of public global variables]==============================*/
-
-/*=====[Definitions of private global variables]=============================*/
-
-/*=====[Prototypes (declarations) of private functions]======================*/
-
 /*=====[Implementation of public functions]==================================*/
 
 void saltInit(void) {

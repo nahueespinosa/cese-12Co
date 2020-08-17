@@ -10,16 +10,6 @@
 #include "safety.h"
 #include "relay.h"
 
-/*=====[Definition macros of private constants]==============================*/
-
-/*=====[Definitions of extern global variables]==============================*/
-
-/*=====[Definitions of public global variables]==============================*/
-
-/*=====[Definitions of private global variables]=============================*/
-
-/*=====[Prototypes (declarations) of private functions]======================*/
-
 /*=====[Implementation of public functions]==================================*/
 
 void safetyIsolatedModeEnable(void) {
