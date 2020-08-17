@@ -17,15 +17,6 @@
 #include "seos_pont_2014_isr.h"       // <= dispatcher and task management header
 #include "seos_pont_2014_scheduler.h" // <= scheduler and system initialization header
 
-
-/*=====[Definition macros of private constants]==============================*/
-
-/*=====[Definitions of extern global variables]==============================*/
-
-/*=====[Definitions of public global variables]==============================*/
-
-/*=====[Definitions of private global variables]=============================*/
-
 /*=====[Main function, program entry point after power on or reset]==========*/
 
 int main(void)

@@ -73,5 +73,3 @@ void safetySignalDeactivateFE(void) {
       relayWrite(RELAY_REG_3, OFF);
    }
 }
-
-/*=====[Implementation of private functions]=================================*/

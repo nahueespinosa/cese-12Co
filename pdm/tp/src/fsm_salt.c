@@ -109,5 +109,3 @@ void saltUpdate(void) {
       break;
    }
 }
-
-/*=====[Implementation of private functions]=================================*/
