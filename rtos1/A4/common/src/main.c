@@ -117,6 +117,7 @@ void delay_con_for( uint32_t ms )
 		for( j=0 ; j<CUENTAS_1MS ; j++ )
 		{
 		}
+		taskYIELD();
 	}
 }
 
@@ -148,7 +149,7 @@ void tarea_A_code( void* taskParmPtr )
 			  ( const char * )"tarea_b",   // Nombre de fantasia
 			  configMINIMAL_STACK_SIZE*2,  /* tamaño del stack de cada tarea (words) */
 			  NULL,                        // Parametros de tarea
-			  my_prio - 1,                 /* le doy menos prioridad que la tarea actual (la A) */
+			  my_prio - 2,                 /* le doy menos prioridad que la tarea actual (la A) */
 			  &task_handles[1]             // Puntero a la tarea creada en el sistema
 		  );
 
