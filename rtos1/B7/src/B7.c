@@ -13,6 +13,7 @@
 #include "FreeRTOSConfig.h"
 
 #include "sapi.h"
+#include "tipos.h"
 
 /*==================[definiciones y macros]==================================*/
 
@@ -21,17 +22,15 @@
 #define BUTTON_RATE 1
 
 /*==================[definiciones de datos internos]=========================*/
+tLedTecla config;
 
 /*==================[definiciones de datos externos]=========================*/
-
 
 DEBUG_PRINT_ENABLE;
 
 /*==================[declaraciones de funciones internas]====================*/
 
 /*==================[declaraciones de funciones externas]====================*/
-TickType_t get_diff();
-void clear_diff();
 
 // Prototipo de funcion de la tarea
 void tarea_led( void* taskParmPtr );
@@ -46,9 +45,9 @@ int main( void )
 	boardConfig();									// Inicializar y configurar la plataforma
 
 	debugPrintConfigUart( UART_USB, 115200 );		// UART for debug messages
-	printf( "Ejercicio B_3.\r\n" );
+	printf( "Ejercicio B_7.\r\n" );
 
-	//gpioWrite( LED3, ON );							// Led para dar señal de vida
+	//gpioWrite( LED3, ON );							// Led para dar seï¿½al de vida
 
     // Crear tarea en freeRTOS
     BaseType_t res_A =
@@ -60,7 +59,6 @@ int main( void )
         tskIDLE_PRIORITY+1,         // Prioridad de la tarea
         0                           // Puntero a la tarea creada en el sistema
     );
-
 
     BaseType_t res_B =
     xTaskCreate(
@@ -100,12 +98,14 @@ int main( void )
 /*==================[definiciones de funciones externas]=====================*/
 
 void tarea_tecla( void* taskParmPtr )
-{
-	fsmButtonInit();
-
+{	
+   config.led = LEDB;
+   config.tecla = TEC1;
+   fsmButtonInit( &config );
+    
 	while( TRUE )
 	{
-		fsmButtonUpdate( TEC1 );
+		fsmButtonUpdate( &config );
 	 	vTaskDelay( BUTTON_RATE / portTICK_RATE_MS );
 	 	//vTaskDelay ( pdMS_TO_TICKS(BUTTON_RATE) );
 	}
@@ -114,26 +114,18 @@ void tarea_tecla( void* taskParmPtr )
 // Implementacion de funcion de la tarea
 void tarea_led( void* taskParmPtr )
 {
+    TickType_t tiempo_inicio_ciclo;
+
     // ---------- CONFIGURACIONES ------------------------------
+    tiempo_inicio_ciclo = xTaskGetTickCount();
 
     // ---------- REPETIR POR SIEMPRE --------------------------
     while( TRUE )
     {
-    	TickType_t dif = get_diff();
-
-    	if( dif == 0  )
-		{
-    		vTaskDelay( LED_RATE / portTICK_RATE_MS);	//40 ms es el debounce type.
-    		//vTaskDelay ( pdMS_TO_TICKS(LED_RATE) );
-		}
-		else
-		{
-			gpioWrite( LEDB , ON );
-			vTaskDelay( dif );
-			gpioWrite( LEDB , OFF );
-
-			clear_diff();
-		}
+         gpioWrite( config.led , ON );
+         vTaskDelay( config.tiempo_medido );
+         gpioWrite( config.led , OFF );
+         vTaskDelayUntil( &tiempo_inicio_ciclo, 1000 / portTICK_RATE_MS );
     }
 }
 
