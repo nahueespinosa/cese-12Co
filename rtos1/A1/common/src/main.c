@@ -148,7 +148,7 @@ void Tarea1_Code( void* taskParmPtr )
     while( 1 )
     {
         delay_con_for( 200 );
-        // PRINTF( "Blink %u at %u ms!\r\n", 1 , xTaskGetTickCount() );
+        //PRINTF( "Blink %u at %u ms!\r\n", 1 , xTaskGetTickCount() );
         gpioToggle( LEDR );
     }
 }
@@ -164,7 +164,8 @@ void Tarea2_Code( void* taskParmPtr )
     while( 1 )
     {
         delay_con_for( 500 );
-        PRINTF( "Blink %u at %u ms!\r\n", 2 , xTaskGetTickCount() );
+
+        //PRINTF( "Blink %u at %u ms!\r\n", 2 , xTaskGetTickCount() );
         gpioToggle( LEDB );
 
 #if HACER_FALLAR==1
@@ -181,7 +182,7 @@ void Tarea_Monitor_Code( void* taskParmPtr )
     {
         delay_con_for( 1000 );
 
-        PRINTF( " Task %u min %u words\r\n", 1,  uxTaskGetStackHighWaterMark( task_handles[0] ) );
+        PRINTF( "Task %u min %u words\r\n", 1,  uxTaskGetStackHighWaterMark( task_handles[0] ) );
         PRINTF( " Task %u min %u words\r\n", 2,  uxTaskGetStackHighWaterMark( task_handles[1] ) );
         PRINTF( " Task %u min %u words\r\n", 3,  uxTaskGetStackHighWaterMark( task_handles[2] ) );
     }
