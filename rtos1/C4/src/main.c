@@ -29,16 +29,16 @@ int main( void )
 {
     // ---------- CONFIGURACIONES ------------------------------
 
-	boardConfig();								      // Inicializar y configurar la plataforma
+	boardConfig();                            // Inicializar y configurar la plataforma
 
-	debugPrintConfigUart( UART, BAUD_RATE );	// UART for debug messages
+	debugPrintConfigUart( UART, BAUD_RATE );  // UART for debug messages
 	printf( MSG_WELCOME );
 
-	tecla_led_init();							      // Inicializar estructura de datos
+	tecla_led_init();                         // Inicializar estructura de datos
 
 	 // Crear y validar tarea en freeRTOS
-	tareas_crear(tarea_tecla,MSG_TECLA);		 // Tareas de teclas
-	tareas_crear(tarea_led,MSG_LED);			    // Tareas de leds
+	tareas_crear( tarea_tecla, MSG_TECLA );   // Tareas de teclas
+	tareas_crear( tarea_led  , MSG_LED );     // Tareas de leds
 
    // Iniciar scheduler
    vTaskStartScheduler();
