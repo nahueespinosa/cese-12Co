@@ -11,12 +11,12 @@
 
 /*==================[inclusiones]============================================*/
 
+#include "fsm_debounce.h"
 #include "FreeRTOS.h"
 #include "task.h"
 #include "FreeRTOSConfig.h"
 #include "sapi.h"
 
-#include "FSM.h"
 #include "tasks.h"
 
 /*==================[definiciones y macros]==================================*/

@@ -17,9 +17,9 @@
 #include "sapi.h"
 #include "semphr.h"
 
-#include "FSM.h"
 #include "tasks.h"
 #include <string.h>
+#include "fsm_debounce.h"
 
 /*==================[definiciones y macros]==================================*/
 

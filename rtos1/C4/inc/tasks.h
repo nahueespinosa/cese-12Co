@@ -13,10 +13,9 @@
 #include "FreeRTOS.h"
 #include "sapi.h"
 #include "semphr.h"
-#include "FSM.h"
-
 #include "auxs.h"
 #include <string.h>
+#include "fsm_debounce.h"
 
 /*==================[definiciones y macros]==================================*/
 #define LED_RATE_MS 40
