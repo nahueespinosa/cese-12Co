@@ -5,16 +5,19 @@
  * Date: 2020/09/03
  * Version: v1.1
  *===========================================================================*/
-#ifndef _TIPOS_H_
-#define _TIPOS_H_
+#ifndef _FSM_H_
+#define _FSM_H_
 
-#include "FreeRTOSConfig.h"
+/*==================[inclusiones]============================================*/
 #include "FreeRTOS.h"
+#include "task.h"
+#include "FreeRTOSConfig.h"
 #include "sapi.h"
 #include "semphr.h"
-
+/*==================[definiciones y macros]==================================*/
 #define DEBOUNCE_TIME 40
-
+/*==================[definiciones de datos]=========================*/
+// Tipo de dato FSM
 typedef enum
 {
     STATE_BUTTON_UP,
@@ -23,6 +26,7 @@ typedef enum
     STATE_BUTTON_RISING
 } fsmButtonState_t;
 
+// Estructura principal
 typedef struct
 {
 	gpioMap_t tecla;			//config
@@ -39,4 +43,14 @@ typedef struct
 } tLedTecla;
 
 
-#endif /* _TIPOS_H_ */
+/*==================[prototipos de funciones]====================*/
+TickType_t get_diff();
+void clear_diff();
+
+void fsmButtonError( tLedTecla* config );
+void fsmButtonInit( tLedTecla* config );
+void fsmButtonUpdate( tLedTecla* config );
+void buttonPressed( tLedTecla* config );
+void buttonReleased( tLedTecla* config );
+
+#endif /* _FSM_H_ */
