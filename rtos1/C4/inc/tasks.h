@@ -5,31 +5,35 @@
  * Date: 2020/09/03
  * Version: v1.1
  *===========================================================================*/
+
 #ifndef _TASKS_H_
 #define _TASKS_H_
 
 /*==================[inclusiones]============================================*/
+
 #include "FreeRTOSConfig.h"
 #include "FreeRTOS.h"
 #include "sapi.h"
 #include "semphr.h"
 #include "auxs.h"
-#include <string.h>
 #include "fsm_debounce.h"
 
 /*==================[definiciones y macros]==================================*/
-#define LED_RATE_MS 40
-#define MAX_RATE_MS 3000
-#define BUTTON_RATE_MS 1
 
-#define LED_RATE pdMS_TO_TICKS(LED_RATE_MS)
-#define MAX_RATE pdMS_TO_TICKS(MAX_RATE_MS)
-#define BUTTON_RATE pdMS_TO_TICKS(BUTTON_RATE_MS)
+#define BUTTON_RATE_MS     1
+#define SEM_WAIT_RATE_MS   1000
+#define LED_ON_TIME_MS     250
+
+#define BUTTON_RATE        pdMS_TO_TICKS(BUTTON_RATE_MS)
+#define SEM_WAIT_RATE      pdMS_TO_TICKS(SEM_WAIT_RATE_MS)
+#define LED_ON_TIME        pdMS_TO_TICKS(LED_ON_TIME_MS)
+
 /*==================[definiciones de datos]=========================*/
-extern gpioMap_t teclas[];
-extern gpioMap_t leds[];
+
 extern tLedTecla tecla_led_config[];
+
 /*==================[prototipos de tareas]====================*/
+
 void tarea_led( void* taskParmPtr );
 void tarea_tecla( void* taskParmPtr );
 

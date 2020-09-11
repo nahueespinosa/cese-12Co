@@ -40,20 +40,20 @@ void tarea_led( void* taskParmPtr )
    // ---------- CONFIGURACIONES ------------------------------
 	tLedTecla* config = (tLedTecla*) taskParmPtr;
 
-	TickType_t xPeriodicity =  MAX_RATE;
-	TickType_t xLastWakeTime = xTaskGetTickCount();
-
    // ---------- REPETIR POR SIEMPRE --------------------------
 	while( TRUE )
 	{
-		xSemaphoreTake(  config->sem_tec_pulsada  ,  portMAX_DELAY );
-
-		xLastWakeTime = xTaskGetTickCount();
-
-		gpioWrite( config->led , ON );
-		vTaskDelay( xPeriodicity / 2 );
-
-		gpioWrite( config->led , OFF );
-		vTaskDelayUntil( &xLastWakeTime , xPeriodicity );
+      if( xSemaphoreTake( config->sem_tec_pulsada, SEM_WAIT_RATE ) == pdTRUE )
+      {
+         gpioWrite( LEDG , ON );
+         vTaskDelay( LED_ON_TIME );
+         gpioWrite( LEDG , OFF );
+      }
+      else
+      {
+         gpioWrite( LEDR , ON );
+         vTaskDelay( LED_ON_TIME );
+         gpioWrite( LEDR , OFF );
+      }
 	}
 }
