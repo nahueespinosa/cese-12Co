@@ -24,7 +24,6 @@
 /*==================[definiciones y macros]==================================*/
 
 #define LED_ERROR 		LEDR
-#define MAX_SEM         3
 
 #define PRIORITY        1
 #define SIZE            1

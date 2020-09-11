@@ -54,7 +54,7 @@ void tecla_led_init(void)
 	{
 		tecla_led_config[i].led 	= leds[i];
 		tecla_led_config[i].tecla 	= teclas[i];
-		tecla_led_config[i].sem_tec_pulsada = xSemaphoreCreateCounting( MAX_SEM , 0 );
+		tecla_led_config[i].sem_tec_pulsada = xSemaphoreCreateBinary();
 
 		// Gestion de errores de semaforos
 		if( tecla_led_config[i].sem_tec_pulsada == pdFALSE)
