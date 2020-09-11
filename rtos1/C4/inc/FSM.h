@@ -5,18 +5,24 @@
  * Date: 2020/09/03
  * Version: v1.1
  *===========================================================================*/
+
 #ifndef _FSM_H_
 #define _FSM_H_
 
 /*==================[inclusiones]============================================*/
+
 #include "FreeRTOS.h"
 #include "task.h"
 #include "FreeRTOSConfig.h"
 #include "sapi.h"
 #include "semphr.h"
+
 /*==================[definiciones y macros]==================================*/
+
 #define DEBOUNCE_TIME 40
+
 /*==================[definiciones de datos]=========================*/
+
 // Tipo de dato FSM
 typedef enum
 {
@@ -42,8 +48,8 @@ typedef struct
 	SemaphoreHandle_t sem_tec_pulsada;
 } tLedTecla;
 
-
 /*==================[prototipos de funciones]====================*/
+
 TickType_t get_diff();
 void clear_diff();
 

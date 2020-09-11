@@ -7,8 +7,10 @@
  *===========================================================================*/
 
 /*==================[inclusiones]============================================*/
+
 #include "FSM.h"
-/*==================[prototipos]============================================*/
+
+/*==================[prototipos]=============================================*/
 
 void fsmButtonError( tLedTecla* config );
 void fsmButtonInit( tLedTecla* config );
@@ -16,7 +18,7 @@ void fsmButtonUpdate( tLedTecla* config );
 void buttonPressed( tLedTecla* config );
 void buttonReleased( tLedTecla* config );
 
-/*==================[funciones]============================================*/
+/*==================[funciones]==============================================*/
 
 /* accion de el evento de tecla pulsada */
 void buttonPressed( tLedTecla* config )
@@ -43,8 +45,6 @@ void fsmButtonInit( tLedTecla* config )
 	config->contRising = 0;
 	config->fsmButtonState = BUTTON_UP;  // Set initial state
 }
-
-
 
 // FSM Update Sate Function
 void fsmButtonUpdate( tLedTecla* config )
@@ -87,12 +87,12 @@ void fsmButtonUpdate( tLedTecla* config )
             break;
 
         case STATE_BUTTON_DOWN:
-			/* CHECK TRANSITION CONDITIONS */
-			if( gpioRead( config->tecla ) )
-			{
-				config->fsmButtonState = STATE_BUTTON_RISING;
-			}
-			break;
+            /* CHECK TRANSITION CONDITIONS */
+            if( gpioRead( config->tecla ) )
+            {
+               config->fsmButtonState = STATE_BUTTON_RISING;
+            }
+            break;
 
         case STATE_BUTTON_RISING:
             /* ENTRY */

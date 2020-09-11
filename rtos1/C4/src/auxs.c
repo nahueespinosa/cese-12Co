@@ -7,12 +7,15 @@
  *===========================================================================*/
 
 /*==================[inclusiones]============================================*/
+
 #include "auxs.h"
+
 /*==================[definiciones y macros]==================================*/
 
 /*==================[definiciones de datos internos]=========================*/
 
 /*==================[definiciones de datos externos]=========================*/
+
 gpioMap_t teclas[] = {TEC1,TEC2,TEC3,TEC4};
 gpioMap_t leds[]   = {LEDB,LED1,LED2,LED3};
 
@@ -24,7 +27,7 @@ tLedTecla tecla_led_config[N_TECLAS];
 
 /*==================[declaraciones de funciones externas]====================*/
 
-/*==================[tareas]====================*/
+/*==================[tareas]=================================================*/
 
 // Funcion que crea la cantidad de tareas definida en N_TECLAS
 void tareas_crear(TaskFunction_t tarea,const char * const nombre)
@@ -74,6 +77,6 @@ void tarea_crear(TaskFunction_t tarea,const char * const nombre,uint8_t stack,vo
 	{
 		gpioWrite( LED_ERROR , ON );
 		printf( MSG_ERROR_TASK );
-		while(TRUE);						// VER ESTE LINK: https://pbs.twimg.com/media/BafQje7CcAAN5en.jpg
+		while(TRUE);						  // VER ESTE LINK: https://pbs.twimg.com/media/BafQje7CcAAN5en.jpg
 	}
 }

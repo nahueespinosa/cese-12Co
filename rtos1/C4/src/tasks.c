@@ -7,7 +7,9 @@
  *===========================================================================*/
 
 /*==================[inclusiones]============================================*/
+
 #include "tasks.h"
+
 /*==================[definiciones y macros]==================================*/
 
 /*==================[definiciones de datos internos]=========================*/
@@ -18,7 +20,7 @@
 
 /*==================[declaraciones de funciones externas]====================*/
 
-/*==================[tareas]====================*/
+/*==================[tareas]=================================================*/
 
 void tarea_tecla( void* taskParmPtr )
 {
@@ -35,13 +37,13 @@ void tarea_tecla( void* taskParmPtr )
 
 void tarea_led( void* taskParmPtr )
 {
-    // ---------- CONFIGURACIONES ------------------------------
+   // ---------- CONFIGURACIONES ------------------------------
 	tLedTecla* config = (tLedTecla*) taskParmPtr;
 
 	TickType_t xPeriodicity =  MAX_RATE;
 	TickType_t xLastWakeTime = xTaskGetTickCount();
-    // ---------- REPETIR POR SIEMPRE --------------------------
 
+   // ---------- REPETIR POR SIEMPRE --------------------------
 	while( TRUE )
 	{
 		xSemaphoreTake(  config->sem_tec_pulsada  ,  portMAX_DELAY );
