@@ -24,25 +24,25 @@
 
 void tarea_tecla( void* taskParmPtr )
 {
-	tLedTecla* config = (tLedTecla*) taskParmPtr;
+   tLedTecla* config = (tLedTecla*) taskParmPtr;
 
-	fsmButtonInit( config );
+   fsmButtonInit( config );
 
-	while( TRUE )
-	{
-		fsmButtonUpdate( config );
-		vTaskDelay( BUTTON_RATE );
-	}
+   while( TRUE )
+   {
+      fsmButtonUpdate( config );
+      vTaskDelay( BUTTON_RATE );
+   }
 }
 
 void tarea_led( void* taskParmPtr )
 {
    // ---------- CONFIGURACIONES ------------------------------
-	tLedTecla* config = (tLedTecla*) taskParmPtr;
+   tLedTecla* config = (tLedTecla*) taskParmPtr;
 
    // ---------- REPETIR POR SIEMPRE --------------------------
-	while( TRUE )
-	{
+   while( TRUE )
+   {
       if( xSemaphoreTake( config->sem_tec_pulsada, SEM_WAIT_RATE ) == pdTRUE )
       {
          gpioWrite( LEDG , ON );
@@ -55,5 +55,5 @@ void tarea_led( void* taskParmPtr )
          vTaskDelay( LED_ON_TIME );
          gpioWrite( LEDR , OFF );
       }
-	}
+   }
 }

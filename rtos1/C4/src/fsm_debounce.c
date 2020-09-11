@@ -23,27 +23,27 @@ void buttonReleased( tLedTecla* config );
 /* accion de el evento de tecla pulsada */
 void buttonPressed( tLedTecla* config )
 {
-	config->tiempo_down = xTaskGetTickCount();
+   config->tiempo_down = xTaskGetTickCount();
 }
 
 /* accion de el evento de tecla liberada */
 void buttonReleased( tLedTecla* config )
 {
-	config->tiempo_medido = xTaskGetTickCount() - config->tiempo_down;
+   config->tiempo_medido = xTaskGetTickCount() - config->tiempo_down;
 
-	xSemaphoreGive(  config->sem_tec_pulsada );
+   xSemaphoreGive(  config->sem_tec_pulsada );
 }
 
 void fsmButtonError( tLedTecla* config )
 {
-	config->fsmButtonState = BUTTON_UP;
+   config->fsmButtonState = BUTTON_UP;
 }
 
 void fsmButtonInit( tLedTecla* config )
 {
-	config->contFalling = 0;
-	config->contRising = 0;
-	config->fsmButtonState = BUTTON_UP;  // Set initial state
+   config->contFalling = 0;
+   config->contRising = 0;
+   config->fsmButtonState = BUTTON_UP;  // Set initial state
 }
 
 // FSM Update Sate Function
@@ -56,7 +56,7 @@ void fsmButtonUpdate( tLedTecla* config )
             /* CHECK TRANSITION CONDITIONS */
             if( !gpioRead( config->tecla ) )
             {
-            	config->fsmButtonState = STATE_BUTTON_FALLING;
+               config->fsmButtonState = STATE_BUTTON_FALLING;
             }
             break;
 
@@ -68,14 +68,14 @@ void fsmButtonUpdate( tLedTecla* config )
             {
                 if( !gpioRead( config->tecla ) )
                 {
-                	config->fsmButtonState = STATE_BUTTON_DOWN;
+                   config->fsmButtonState = STATE_BUTTON_DOWN;
 
                     /* ACCION DEL EVENTO !*/
                     buttonPressed(config);
                 }
                 else
                 {
-                	config->fsmButtonState = STATE_BUTTON_UP;
+                   config->fsmButtonState = STATE_BUTTON_UP;
                 }
 
                 config->contFalling = 0;
@@ -103,14 +103,14 @@ void fsmButtonUpdate( tLedTecla* config )
             {
                 if( gpioRead( config->tecla ) )
                 {
-                	config->fsmButtonState = STATE_BUTTON_UP;
+                   config->fsmButtonState = STATE_BUTTON_UP;
 
                     /* ACCION DEL EVENTO ! */
                     buttonReleased(config);
                 }
                 else
                 {
-                	config->fsmButtonState = STATE_BUTTON_DOWN;
+                   config->fsmButtonState = STATE_BUTTON_DOWN;
                 }
                 config->contRising = 0;
             }

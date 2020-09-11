@@ -35,17 +35,17 @@ typedef enum
 // Estructura principal
 typedef struct
 {
-	gpioMap_t tecla;			//config
-	gpioMap_t led;				//config
+   gpioMap_t tecla;         //config
+   gpioMap_t led;            //config
 
-	TickType_t tiempo_medido;	//variables
-	fsmButtonState_t fsmButtonState;//variables
-	TickType_t tiempo_down;		//variables
+   TickType_t tiempo_medido;   //variables
+   fsmButtonState_t fsmButtonState;//variables
+   TickType_t tiempo_down;      //variables
 
-	uint8_t contFalling  ;		//variables
-	uint8_t contRising  ;		//variables
+   uint8_t contFalling  ;      //variables
+   uint8_t contRising  ;      //variables
 
-	SemaphoreHandle_t sem_tec_pulsada;
+   SemaphoreHandle_t sem_tec_pulsada;
 } tLedTecla;
 
 /*==================[prototipos de funciones]====================*/

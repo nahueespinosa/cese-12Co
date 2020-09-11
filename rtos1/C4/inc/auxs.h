@@ -23,14 +23,14 @@
 
 /*==================[definiciones y macros]==================================*/
 
-#define LED_ERROR 		LEDR
+#define LED_ERROR       LEDR
 
 #define PRIORITY        1
 #define SIZE            1
 #define STR_AUX         20
 
 #define MSG_ERROR_TASK  "Error al crear las tareas. \n\r"
-#define MSG_ERROR_SEM	"Error al crear los semaforos.\r\n"
+#define MSG_ERROR_SEM   "Error al crear los semaforos.\r\n"
 
 /*==================[prototipos]=========================*/
 

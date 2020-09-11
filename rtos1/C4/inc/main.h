@@ -25,7 +25,7 @@
 #define BAUD_RATE       115200
 #define UART            UART_USB
 
-#define MSG_TECLA	      "tarea_tecla_"
+#define MSG_TECLA       "tarea_tecla_"
 #define MSG_LED         "tarea_led_"
 
 #endif /* _MAIN_H_ */
