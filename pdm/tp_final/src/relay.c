@@ -5,8 +5,9 @@
 
 /*=====[Inclusions of function dependencies]=================================*/
 
-#include "relay.h"
-#include "switch.h"
+#include "../../tp_final/inc/relay.h"
+
+#include "../../tp_final/inc/switch.h"
 
 /*=====[Definition macros of private constants]==============================*/
 

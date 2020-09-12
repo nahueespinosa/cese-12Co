@@ -5,8 +5,9 @@
 
 /*=====[Inclusions of function dependencies]=================================*/
 
+#include "../../tp_final/inc/switch.h"
+
 #include "sapi.h"
-#include "switch.h"
 
 /*=====[Definition macros of private constants]==============================*/
 

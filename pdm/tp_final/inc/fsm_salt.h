@@ -10,9 +10,9 @@
 
 /*=====[Inclusions of public function dependencies]==========================*/
 
-#include "relay.h"
-#include "switch.h"
-#include "safety.h"
+#include "../../tp_final/inc/relay.h"
+#include "../../tp_final/inc/safety.h"
+#include "../../tp_final/inc/switch.h"
 
 /*=====[C++ - begin]=========================================================*/
 

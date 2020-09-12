@@ -5,7 +5,7 @@
 
 /*=====[Inclusions of function dependencies]=================================*/
 
-#include "fsm_salt.h"
+#include "../../tp_final/inc/fsm_salt.h"
 
 #include "sapi.h"
 

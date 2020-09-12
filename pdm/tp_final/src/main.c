@@ -9,10 +9,10 @@
 
 /*=====[Inclusions of function dependencies]=================================*/
 
-#include "main.h"
+#include "../../tp_final/inc/main.h"
 
 #include "sapi.h"
-#include "fsm_salt.h"
+#include "../../tp_final/inc/fsm_salt.h"
 
 #include "seos_pont_2014_isr.h"       // <= dispatcher and task management header
 #include "seos_pont_2014_scheduler.h" // <= scheduler and system initialization header

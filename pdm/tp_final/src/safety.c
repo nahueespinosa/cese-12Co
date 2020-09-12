@@ -5,10 +5,11 @@
 
 /*=====[Inclusions of function dependencies]=================================*/
 
+#include "../../tp_final/inc/safety.h"
+
+#include "../../tp_final/inc/relay.h"
 #include "sapi.h"
 
-#include "safety.h"
-#include "relay.h"
 
 /*=====[Implementation of public functions]==================================*/
 
