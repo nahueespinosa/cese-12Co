@@ -39,11 +39,12 @@ void tarea_led( void* taskParmPtr )
 {
    // ---------- CONFIGURACIONES ------------------------------
    tLedTecla* config = (tLedTecla*) taskParmPtr;
+   TickType_t xLastWakeTime = xTaskGetTickCount();
 
    // ---------- REPETIR POR SIEMPRE --------------------------
    while( TRUE )
    {
-      if( xSemaphoreTake( config->sem_tec_pulsada, SEM_WAIT_RATE ) == pdTRUE )
+      if( xSemaphoreTake( config->sem_tec_pulsada, 0 ) == pdTRUE )
       {
          gpioWrite( LEDG , ON );
          vTaskDelay( LED_ON_TIME );
@@ -55,5 +56,7 @@ void tarea_led( void* taskParmPtr )
          vTaskDelay( LED_ON_TIME );
          gpioWrite( LEDR , OFF );
       }
+
+      vTaskDelayUntil( &xLastWakeTime, SEM_WAIT_RATE );
    }
 }
