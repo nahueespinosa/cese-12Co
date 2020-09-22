@@ -40,3 +40,12 @@ Los ejecicios son compatibles con el framework firmware v3 (https://github.com/e
 | C_4 | Espera de semaforo | OBLIGATORIO |
 | C_5 | Contador de eventos | Explicado en clase |
 | C_6 | C_5 modular | Explicado en clase |
+
+### Guia D
+| Ejercicio | Descripción | Tipo |
+| :-: | :-: | :-: |
+| D_1 | El B7 tiene errores !  | Explicado en clase |
+| D_2 | Más acceso concurrente | OBLIGATORIO |
+| D_3 | printf conflictivo | Explicado en clase |
+| D_4 | Acceso a un módulo desde varias tareas | OBLIGATORIO |
+| D_5 |  Inversión de prioridades | Explicado en clase |
