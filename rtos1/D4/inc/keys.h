@@ -39,7 +39,6 @@
 /* public macros ================================================================= */
 #define KEYS_INVALID_TIME   -1
 
-
 /* types ================================================================= */
 typedef enum
 {
@@ -69,11 +68,9 @@ typedef struct
 	TickType_t time_diff;	    //variables
 } t_key_data;
 
-extern TickType_t c1;
-extern SemaphoreHandle_t c1_mutex;
-
 /* methods ================================================================= */
 void keys_Init( void );
+void keys_Update( keyMap_t index );
 TickType_t get_diff( keyMap_t index );
 void clear_diff( keyMap_t index );
 

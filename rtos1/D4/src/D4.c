@@ -35,15 +35,9 @@
 #include "FreeRTOS.h"
 #include "FreeRTOSConfig.h"
 #include "task.h"
-
 #include "sapi.h"
-#include "keys.h"
 
-#define  LED_2_PERIODICITY_MS    2000
-#define  LED_2_PERIODICITY       pdMS_TO_TICKS(LED_2_PERIODICITY_MS)
-
-void task_led_1( void* taskParmPtr );
-void task_led_2( void* taskParmPtr );
+#include "tareas.h"
 
 /*=====[Main function, program entry point after power on or reset]==========*/
 
@@ -56,34 +50,7 @@ int main( void )
 
 	printf( "Ejercicio D4\n" );
 
-	// Crear tareas en freeRTOS
-	res = xTaskCreate (
-      task_led_1,					// Funcion de la tarea a ejecutar
-      ( const char * )"task_led_1",	// Nombre de la tarea como String amigable para el usuario
-      configMINIMAL_STACK_SIZE*2,	// Cantidad de stack de la tarea
-      0,							// Parametros de tarea
-      tskIDLE_PRIORITY+1,			// Prioridad de la tarea
-      0							// Puntero a la tarea creada en el sistema
-   );
-
-	// Gestión de errores
-	configASSERT( res == pdPASS );
-
-	// Crear tareas en freeRTOS
-   res = xTaskCreate (
-      task_led_2,             // Funcion de la tarea a ejecutar
-      ( const char * )"task_led_2", // Nombre de la tarea como String amigable para el usuario
-      configMINIMAL_STACK_SIZE*2, // Cantidad de stack de la tarea
-      0,                    // Parametros de tarea
-      tskIDLE_PRIORITY+1,         // Prioridad de la tarea
-      0                     // Puntero a la tarea creada en el sistema
-   );
-
-   // Gestión de errores
-   configASSERT( res == pdPASS );
-
-	/* inicializo driver de teclas */
-	keys_Init();
+	tasks_init();
 
 	// Iniciar scheduler
 	vTaskStartScheduler();					// Enciende tick | Crea idle y pone en ready | Evalua las tareas creadas | Prioridad mas alta pasa a running
@@ -91,39 +58,6 @@ int main( void )
 	/* realizar un assert con "false" es equivalente al while(1) */
 	configASSERT( 0 );
 	return 0;
-}
-
-void task_led_1( void* taskParmPtr )
-{
-   TickType_t xTime;
-
-	while( 1 )
-	{
-	   xSemaphoreTake( c1_mutex, portMAX_DELAY );
-      xTime = c1;
-      xSemaphoreGive( c1_mutex );
-
-      gpioToggle( LED1 );
-      vTaskDelay( xTime );
-	}
-}
-
-void task_led_2( void* taskParmPtr )
-{
-   TickType_t xTime;
-   TickType_t xLastWakeTime = xTaskGetTickCount();
-
-   while( 1 )
-   {
-      xSemaphoreTake( c1_mutex, portMAX_DELAY );
-      xTime = c1 * 2;
-      xSemaphoreGive( c1_mutex );
-
-      gpioWrite( LED2, ON );
-      vTaskDelay( xTime );
-      gpioWrite( LED2, OFF );
-      vTaskDelayUntil( &xLastWakeTime, LED_2_PERIODICITY );
-   }
 }
 
 /* hook que se ejecuta si al necesitar un objeto dinamico, no hay memoria disponible */
