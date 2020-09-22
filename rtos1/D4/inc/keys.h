@@ -30,16 +30,23 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef KEYS_H_
-#define KEYS_H_
+#ifndef _KEYS_H_
+#define _KEYS_H_
 
 #include "FreeRTOS.h"
+#include "semphr.h"
 
 /* public macros ================================================================= */
 #define KEYS_INVALID_TIME   -1
 
 
 /* types ================================================================= */
+typedef enum
+{
+   KEY1,
+   KEY2
+} keyMap_t;
+
 typedef enum
 {
 	STATE_BUTTON_UP,
@@ -62,11 +69,12 @@ typedef struct
 	TickType_t time_diff;	    //variables
 } t_key_data;
 
-typedef enum { TEC1_IDX, TEC2_IDX } keyMap_t;
+extern TickType_t c1;
+extern SemaphoreHandle_t c1_mutex;
 
 /* methods ================================================================= */
 void keys_Init( void );
 TickType_t get_diff( keyMap_t index );
 void clear_diff( keyMap_t index );
 
-#endif /* PDM_ANTIRREBOTE_MEF_INC_DEBOUNCE_H_ */
+#endif /* _KEYS_H_ */

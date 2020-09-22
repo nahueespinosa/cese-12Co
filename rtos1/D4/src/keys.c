@@ -36,14 +36,19 @@
 #include "sapi.h"
 #include "keys.h"
 
-#include "semphr.h"
-
 /*=====[ Definitions of private data types ]===================================*/
 
 
 /*=====[Definition macros of private constants]==============================*/
-//#define BUTTON_RATE     1
-#define DEBOUNCE_TIME   40
+#define DEBOUNCE_TIME         40
+
+#define C1_INITIAL_VALUE_MS   500
+#define C1_MIN_VALUE_MS       100
+#define C1_MAX_VALUE_MS       1900
+
+#define C1_INITIAL_VALUE      pdMS_TO_TICKS(C1_INITIAL_VALUE_MS)
+#define C1_MIN_VALUE          pdMS_TO_TICKS(C1_MIN_VALUE_MS)
+#define C1_MAX_VALUE          pdMS_TO_TICKS(C1_MAX_VALUE_MS)
 
 /*=====[Prototypes (declarations) of private functions]======================*/
 
@@ -53,8 +58,8 @@ static void buttonReleased( keyMap_t index );
 
 /*=====[Definitions of private global variables]=============================*/
 
-int32_t c1;
-SemaphoreHandle_t mutex;
+TickType_t c1;
+SemaphoreHandle_t c1_mutex;
 
 /*=====[Definitions of public global variables]==============================*/
 
@@ -90,32 +95,29 @@ void keys_Init( void )
 {
 	BaseType_t res;
 
-	keys_data[0].state          = BUTTON_UP;  // Set initial state
-	keys_data[0].time_down      = KEYS_INVALID_TIME;
-	keys_data[0].time_up        = KEYS_INVALID_TIME;
-	keys_data[0].time_diff      = KEYS_INVALID_TIME;
+	keys_data[KEY1].state          = BUTTON_UP;  // Set initial state
+	keys_data[KEY1].time_down      = KEYS_INVALID_TIME;
+	keys_data[KEY1].time_up        = KEYS_INVALID_TIME;
+	keys_data[KEY1].time_diff      = KEYS_INVALID_TIME;
 
-	keys_data[1].state          = BUTTON_UP;  // Set initial state
-   keys_data[1].time_down      = KEYS_INVALID_TIME;
-   keys_data[1].time_up        = KEYS_INVALID_TIME;
-   keys_data[1].time_diff      = KEYS_INVALID_TIME;
+	keys_data[KEY2].state          = BUTTON_UP;  // Set initial state
+   keys_data[KEY2].time_down      = KEYS_INVALID_TIME;
+   keys_data[KEY2].time_up        = KEYS_INVALID_TIME;
+   keys_data[KEY2].time_diff      = KEYS_INVALID_TIME;
 
 	// Crear tareas en freeRTOS
 	res = xTaskCreate (
-			  task_teclas,					// Funcion de la tarea a ejecutar
-			  ( const char * )"task_teclas",	// Nombre de la tarea como String amigable para el usuario
-			  configMINIMAL_STACK_SIZE*2,	// Cantidad de stack de la tarea
-			  0,							// Parametros de tarea
-			  tskIDLE_PRIORITY+1,			// Prioridad de la tarea
-			  0							// Puntero a la tarea creada en el sistema
-		  );
+      task_teclas,					// Funcion de la tarea a ejecutar
+      ( const char * )"task_teclas",	// Nombre de la tarea como String amigable para el usuario
+      configMINIMAL_STACK_SIZE*2,	// Cantidad de stack de la tarea
+      0,							// Parametros de tarea
+      tskIDLE_PRIORITY+1,			// Prioridad de la tarea
+      0							// Puntero a la tarea creada en el sistema
+   );
 
-
-
-	mutex = xSemaphoreCreateMutex();
-
-	c1 = 500;
-	xSemaphoreGive(mutex);
+	c1_mutex = xSemaphoreCreateMutex();
+	c1 = C1_INITIAL_VALUE;
+	xSemaphoreGive( c1_mutex );
 
 	// Gestión de errores
 	configASSERT( res == pdPASS );
@@ -224,30 +226,42 @@ void task_teclas( void* taskParmPtr )
 
 	while( 1 )
 	{
-		keys_Update( TEC1_IDX );
+	   // Actualiza estado de la tecla 1
+		keys_Update( KEY1 );
 
-		dif = get_diff( TEC1_IDX );
+		dif = get_diff( KEY1 );
 
       if( dif != KEYS_INVALID_TIME ) {
-         xSemaphoreTake(mutex, portMAX_DELAY);
-         c1 += dif;
-         if( c1 > 1900 ) c1 = 1900;
-         xSemaphoreGive(mutex);
+         xSemaphoreTake(c1_mutex, portMAX_DELAY);
 
-         clear_diff( TEC1_IDX );
+         if( c1 + dif > C1_MAX_VALUE ) {
+            c1 = C1_MAX_VALUE;
+         } else {
+            c1 += dif;
+         }
+
+         xSemaphoreGive(c1_mutex);
+
+         clear_diff( KEY1 );
       }
 
-      keys_Update( TEC2_IDX );
+      // Actualiza estado de la tecla 2
+      keys_Update( KEY2 );
 
-      dif = get_diff( TEC2_IDX );
+      dif = get_diff( KEY2 );
 
       if( dif != KEYS_INVALID_TIME ) {
-         xSemaphoreTake(mutex, portMAX_DELAY);
-         c1 -= dif;
-         if( c1 < 100 ) c1 = 100;
-         xSemaphoreGive(mutex);
+         xSemaphoreTake(c1_mutex, portMAX_DELAY);
 
-         clear_diff( TEC2_IDX );
+         if( c1 < C1_MIN_VALUE + dif ) {
+            c1 = C1_MIN_VALUE;
+         } else {
+            c1 -= dif;
+         }
+
+         xSemaphoreGive(c1_mutex);
+
+         clear_diff( KEY2 );
       }
 
 		vTaskDelay( DEBOUNCE_TIME / portTICK_RATE_MS );

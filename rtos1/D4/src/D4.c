@@ -31,26 +31,20 @@
  */
 
 /*=====[Inclusions of function dependencies]=================================*/
+
 #include "FreeRTOS.h"
 #include "FreeRTOSConfig.h"
 #include "task.h"
 
-#include "semphr.h"
-
 #include "sapi.h"
 #include "keys.h"
 
-/*=====[Definition & macros of public constants]==============================*/
+#define  LED_2_PERIODICITY_MS    2000
+#define  LED_2_PERIODICITY       pdMS_TO_TICKS(LED_2_PERIODICITY_MS)
 
-/*=====[Definitions of extern global functions]==============================*/
-
-// Prototipo de funcion de la tarea
-void task_led( void* taskParmPtr );
+void task_led_1( void* taskParmPtr );
 void task_led_2( void* taskParmPtr );
 
-/*=====[Definitions of public global variables]==============================*/
-extern int32_t c1;
-extern SemaphoreHandle_t mutex;
 /*=====[Main function, program entry point after power on or reset]==========*/
 
 int main( void )
@@ -60,33 +54,33 @@ int main( void )
 	// ---------- CONFIGURACIONES ------------------------------
 	boardConfig();  // Inicializar y configurar la plataforma
 
-	printf( "Ejercicio D1\n" );
+	printf( "Ejercicio D4\n" );
 
 	// Crear tareas en freeRTOS
 	res = xTaskCreate (
-			  task_led,					// Funcion de la tarea a ejecutar
-			  ( const char * )"task_led",	// Nombre de la tarea como String amigable para el usuario
-			  configMINIMAL_STACK_SIZE*2,	// Cantidad de stack de la tarea
-			  0,							// Parametros de tarea
-			  tskIDLE_PRIORITY+1,			// Prioridad de la tarea
-			  0							// Puntero a la tarea creada en el sistema
-		  );
+      task_led_1,					// Funcion de la tarea a ejecutar
+      ( const char * )"task_led_1",	// Nombre de la tarea como String amigable para el usuario
+      configMINIMAL_STACK_SIZE*2,	// Cantidad de stack de la tarea
+      0,							// Parametros de tarea
+      tskIDLE_PRIORITY+1,			// Prioridad de la tarea
+      0							// Puntero a la tarea creada en el sistema
+   );
 
 	// Gestión de errores
 	configASSERT( res == pdPASS );
 
 	// Crear tareas en freeRTOS
-	   res = xTaskCreate (
-	           task_led_2,             // Funcion de la tarea a ejecutar
-	           ( const char * )"task_led_2", // Nombre de la tarea como String amigable para el usuario
-	           configMINIMAL_STACK_SIZE*2, // Cantidad de stack de la tarea
-	           0,                    // Parametros de tarea
-	           tskIDLE_PRIORITY+1,         // Prioridad de la tarea
-	           0                     // Puntero a la tarea creada en el sistema
-	        );
+   res = xTaskCreate (
+      task_led_2,             // Funcion de la tarea a ejecutar
+      ( const char * )"task_led_2", // Nombre de la tarea como String amigable para el usuario
+      configMINIMAL_STACK_SIZE*2, // Cantidad de stack de la tarea
+      0,                    // Parametros de tarea
+      tskIDLE_PRIORITY+1,         // Prioridad de la tarea
+      0                     // Puntero a la tarea creada en el sistema
+   );
 
-	   // Gestión de errores
-	   configASSERT( res == pdPASS );
+   // Gestión de errores
+   configASSERT( res == pdPASS );
 
 	/* inicializo driver de teclas */
 	keys_Init();
@@ -99,15 +93,15 @@ int main( void )
 	return 0;
 }
 
-void task_led( void* taskParmPtr )
+void task_led_1( void* taskParmPtr )
 {
    TickType_t xTime;
 
 	while( 1 )
 	{
-	   xSemaphoreTake(mutex, portMAX_DELAY);
+	   xSemaphoreTake( c1_mutex, portMAX_DELAY );
       xTime = c1;
-      xSemaphoreGive(mutex);
+      xSemaphoreGive( c1_mutex );
 
       gpioToggle( LED1 );
       vTaskDelay( xTime );
@@ -117,20 +111,18 @@ void task_led( void* taskParmPtr )
 void task_led_2( void* taskParmPtr )
 {
    TickType_t xTime;
-   TickType_t xPeriodicity = pdMS_TO_TICKS( 2000 ); // Tarea periodica cada 1000 ms
-
    TickType_t xLastWakeTime = xTaskGetTickCount();
 
    while( 1 )
    {
-      xSemaphoreTake(mutex, portMAX_DELAY);
+      xSemaphoreTake( c1_mutex, portMAX_DELAY );
       xTime = c1 * 2;
-      xSemaphoreGive(mutex);
+      xSemaphoreGive( c1_mutex );
 
       gpioWrite( LED2, ON );
       vTaskDelay( xTime );
       gpioWrite( LED2, OFF );
-      vTaskDelayUntil( &xLastWakeTime, xPeriodicity );
+      vTaskDelayUntil( &xLastWakeTime, LED_2_PERIODICITY );
    }
 }
 
