@@ -62,9 +62,11 @@ typedef struct
 	TickType_t time_diff;	    //variables
 } t_key_data;
 
+typedef enum { TEC1_IDX, TEC2_IDX } keyMap_t;
+
 /* methods ================================================================= */
 void keys_Init( void );
-TickType_t get_diff();
-void clear_diff();
+TickType_t get_diff( keyMap_t index );
+void clear_diff( keyMap_t index );
 
 #endif /* PDM_ANTIRREBOTE_MEF_INC_DEBOUNCE_H_ */

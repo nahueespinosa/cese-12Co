@@ -45,38 +45,40 @@
 
 /*=====[Prototypes (declarations) of private functions]======================*/
 
-static void keys_ButtonError( uint32_t index );
-static void buttonPressed( uint32_t index );
-static void buttonReleased( uint32_t index );
+static void keys_ButtonError( keyMap_t index );
+static void buttonPressed( keyMap_t index );
+static void buttonReleased( keyMap_t index );
 
 /*=====[Definitions of private global variables]=============================*/
 
 /*=====[Definitions of public global variables]==============================*/
-const t_key_config  keys_config[] = { TEC1 } ;
+
+static const t_key_config  keys_config[] = { TEC1, TEC2 } ;
 
 #define key_count   sizeof(keys_config)/sizeof(keys_config[0])
 
 t_key_data keys_data[key_count];
 
 /*=====[prototype of private functions]=================================*/
-void task_tecla( void* taskParmPtr );
+void task_tecla_1( void* taskParmPtr );
+void task_tecla_2( void* taskParmPtr );
 
 /*=====[Implementations of public functions]=================================*/
-TickType_t get_diff()
+TickType_t get_diff( keyMap_t index )
 {
 	TickType_t tiempo;
 
 	taskENTER_CRITICAL();
-	tiempo = keys_data[0].time_diff;
+	tiempo = keys_data[index].time_diff;
 	taskEXIT_CRITICAL();
 
 	return tiempo;
 }
 
-void clear_diff()
+void clear_diff( keyMap_t index )
 {
 	taskENTER_CRITICAL();
-	keys_data[0].time_diff = 0;
+	keys_data[0].time_diff = KEYS_INVALID_TIME;
 	taskEXIT_CRITICAL();
 }
 
@@ -91,8 +93,8 @@ void keys_Init( void )
 
 	// Crear tareas en freeRTOS
 	res = xTaskCreate (
-			  task_tecla,					// Funcion de la tarea a ejecutar
-			  ( const char * )"task_tecla",	// Nombre de la tarea como String amigable para el usuario
+			  task_tecla_1,					// Funcion de la tarea a ejecutar
+			  ( const char * )"task_tecla_1",	// Nombre de la tarea como String amigable para el usuario
 			  configMINIMAL_STACK_SIZE*2,	// Cantidad de stack de la tarea
 			  0,							// Parametros de tarea
 			  tskIDLE_PRIORITY+1,			// Prioridad de la tarea
@@ -101,10 +103,23 @@ void keys_Init( void )
 
 	// Gestión de errores
 	configASSERT( res == pdPASS );
+
+	// Crear tareas en freeRTOS
+   res = xTaskCreate (
+           task_tecla_2,               // Funcion de la tarea a ejecutar
+           ( const char * )"task_tecla_2",   // Nombre de la tarea como String amigable para el usuario
+           configMINIMAL_STACK_SIZE*2, // Cantidad de stack de la tarea
+           0,                    // Parametros de tarea
+           tskIDLE_PRIORITY+1,         // Prioridad de la tarea
+           0                     // Puntero a la tarea creada en el sistema
+        );
+
+   // Gestión de errores
+   configASSERT( res == pdPASS );
 }
 
 // keys_ Update State Function
-void keys_Update( uint32_t index )
+void keys_Update( keyMap_t index )
 {
 	switch( keys_data[index].state )
 	{
@@ -172,17 +187,21 @@ void keys_Update( uint32_t index )
 /*=====[Implementations of private functions]================================*/
 
 /* accion de el evento de tecla pulsada */
-static void buttonPressed( uint32_t index )
+static void buttonPressed( keyMap_t index )
 {
 	TickType_t current_tick_count = xTaskGetTickCount();
 
 	taskENTER_CRITICAL();
 	keys_data[index].time_down = current_tick_count;
 	taskEXIT_CRITICAL();
+
+	if( index == TEC2_IDX ) {
+	   clear_diff( TEC1_IDX );
+	}
 }
 
 /* accion de el evento de tecla liberada */
-static void buttonReleased( uint32_t index )
+static void buttonReleased( keyMap_t index )
 {
 	TickType_t current_tick_count = xTaskGetTickCount();
 
@@ -192,7 +211,7 @@ static void buttonReleased( uint32_t index )
 	taskEXIT_CRITICAL();
 }
 
-static void keys_ButtonError( uint32_t index )
+static void keys_ButtonError( keyMap_t index )
 {
 	taskENTER_CRITICAL();
 	keys_data[index].state = BUTTON_UP;
@@ -200,11 +219,20 @@ static void keys_ButtonError( uint32_t index )
 }
 
 /*=====[Implementations of private functions]=================================*/
-void task_tecla( void* taskParmPtr )
+void task_tecla_1( void* taskParmPtr )
 {
 	while( 1 )
 	{
-		keys_Update( 0 );
+		keys_Update( TEC1_IDX );
 		vTaskDelay( DEBOUNCE_TIME / portTICK_RATE_MS );
 	}
+}
+
+void task_tecla_2( void* taskParmPtr )
+{
+   while( 1 )
+   {
+      keys_Update( TEC2_IDX );
+      vTaskDelay( DEBOUNCE_TIME / portTICK_RATE_MS );
+   }
 }

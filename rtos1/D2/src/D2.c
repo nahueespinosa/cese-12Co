@@ -44,7 +44,6 @@
 
 // Prototipo de funcion de la tarea
 void task_led( void* taskParmPtr );
-void task_tecla( void* taskParmPtr );
 
 /*=====[Definitions of public global variables]==============================*/
 
@@ -91,7 +90,7 @@ void task_led( void* taskParmPtr )
 
 	while( 1 )
 	{
-		TickType_t dif = get_diff();
+		TickType_t dif = get_diff( TEC1_IDX );
 
 		if( dif != KEYS_INVALID_TIME )
 
