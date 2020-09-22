@@ -35,6 +35,8 @@
 #include "FreeRTOSConfig.h"
 #include "task.h"
 
+#include "semphr.h"
+
 #include "sapi.h"
 #include "keys.h"
 
@@ -44,9 +46,11 @@
 
 // Prototipo de funcion de la tarea
 void task_led( void* taskParmPtr );
+void task_led_2( void* taskParmPtr );
 
 /*=====[Definitions of public global variables]==============================*/
-
+extern int32_t c1;
+extern SemaphoreHandle_t mutex;
 /*=====[Main function, program entry point after power on or reset]==========*/
 
 int main( void )
@@ -71,6 +75,19 @@ int main( void )
 	// Gestión de errores
 	configASSERT( res == pdPASS );
 
+	// Crear tareas en freeRTOS
+	   res = xTaskCreate (
+	           task_led_2,             // Funcion de la tarea a ejecutar
+	           ( const char * )"task_led_2", // Nombre de la tarea como String amigable para el usuario
+	           configMINIMAL_STACK_SIZE*2, // Cantidad de stack de la tarea
+	           0,                    // Parametros de tarea
+	           tskIDLE_PRIORITY+1,         // Prioridad de la tarea
+	           0                     // Puntero a la tarea creada en el sistema
+	        );
+
+	   // Gestión de errores
+	   configASSERT( res == pdPASS );
+
 	/* inicializo driver de teclas */
 	keys_Init();
 
@@ -84,25 +101,37 @@ int main( void )
 
 void task_led( void* taskParmPtr )
 {
-	TickType_t xPeriodicity = pdMS_TO_TICKS( 1000 ); // Tarea periodica cada 1000 ms
-
-	TickType_t xLastWakeTime = xTaskGetTickCount();
+   TickType_t xTime;
 
 	while( 1 )
 	{
-		TickType_t dif = get_diff( TEC1_IDX );
+	   xSemaphoreTake(mutex, portMAX_DELAY);
+      xTime = c1;
+      xSemaphoreGive(mutex);
 
-		if( dif != KEYS_INVALID_TIME )
-
-		{
-			gpioWrite( LEDB, ON );
-			vTaskDelay( dif );
-			gpioWrite( LEDB, OFF );
-		}
-
-		// Envia la tarea al estado bloqueado durante xPeriodicity (delay periodico)
-		vTaskDelayUntil( &xLastWakeTime, xPeriodicity );
+      gpioToggle( LED1 );
+      vTaskDelay( xTime );
 	}
+}
+
+void task_led_2( void* taskParmPtr )
+{
+   TickType_t xTime;
+   TickType_t xPeriodicity = pdMS_TO_TICKS( 2000 ); // Tarea periodica cada 1000 ms
+
+   TickType_t xLastWakeTime = xTaskGetTickCount();
+
+   while( 1 )
+   {
+      xSemaphoreTake(mutex, portMAX_DELAY);
+      xTime = c1 * 2;
+      xSemaphoreGive(mutex);
+
+      gpioWrite( LED2, ON );
+      vTaskDelay( xTime );
+      gpioWrite( LED2, OFF );
+      vTaskDelayUntil( &xLastWakeTime, xPeriodicity );
+   }
 }
 
 /* hook que se ejecuta si al necesitar un objeto dinamico, no hay memoria disponible */

@@ -36,6 +36,8 @@
 #include "sapi.h"
 #include "keys.h"
 
+#include "semphr.h"
+
 /*=====[ Definitions of private data types ]===================================*/
 
 
@@ -51,6 +53,9 @@ static void buttonReleased( keyMap_t index );
 
 /*=====[Definitions of private global variables]=============================*/
 
+int32_t c1;
+SemaphoreHandle_t mutex;
+
 /*=====[Definitions of public global variables]==============================*/
 
 static const t_key_config  keys_config[] = { TEC1, TEC2 } ;
@@ -60,8 +65,7 @@ static const t_key_config  keys_config[] = { TEC1, TEC2 } ;
 t_key_data keys_data[key_count];
 
 /*=====[prototype of private functions]=================================*/
-void task_tecla_1( void* taskParmPtr );
-void task_tecla_2( void* taskParmPtr );
+void task_teclas( void* taskParmPtr );
 
 /*=====[Implementations of public functions]=================================*/
 TickType_t get_diff( keyMap_t index )
@@ -78,7 +82,7 @@ TickType_t get_diff( keyMap_t index )
 void clear_diff( keyMap_t index )
 {
 	taskENTER_CRITICAL();
-	keys_data[0].time_diff = KEYS_INVALID_TIME;
+	keys_data[index].time_diff = KEYS_INVALID_TIME;
 	taskEXIT_CRITICAL();
 }
 
@@ -91,31 +95,30 @@ void keys_Init( void )
 	keys_data[0].time_up        = KEYS_INVALID_TIME;
 	keys_data[0].time_diff      = KEYS_INVALID_TIME;
 
+	keys_data[1].state          = BUTTON_UP;  // Set initial state
+   keys_data[1].time_down      = KEYS_INVALID_TIME;
+   keys_data[1].time_up        = KEYS_INVALID_TIME;
+   keys_data[1].time_diff      = KEYS_INVALID_TIME;
+
 	// Crear tareas en freeRTOS
 	res = xTaskCreate (
-			  task_tecla_1,					// Funcion de la tarea a ejecutar
-			  ( const char * )"task_tecla_1",	// Nombre de la tarea como String amigable para el usuario
+			  task_teclas,					// Funcion de la tarea a ejecutar
+			  ( const char * )"task_teclas",	// Nombre de la tarea como String amigable para el usuario
 			  configMINIMAL_STACK_SIZE*2,	// Cantidad de stack de la tarea
 			  0,							// Parametros de tarea
 			  tskIDLE_PRIORITY+1,			// Prioridad de la tarea
 			  0							// Puntero a la tarea creada en el sistema
 		  );
 
+
+
+	mutex = xSemaphoreCreateMutex();
+
+	c1 = 500;
+	xSemaphoreGive(mutex);
+
 	// Gestión de errores
 	configASSERT( res == pdPASS );
-
-	// Crear tareas en freeRTOS
-   res = xTaskCreate (
-           task_tecla_2,               // Funcion de la tarea a ejecutar
-           ( const char * )"task_tecla_2",   // Nombre de la tarea como String amigable para el usuario
-           configMINIMAL_STACK_SIZE*2, // Cantidad de stack de la tarea
-           0,                    // Parametros de tarea
-           tskIDLE_PRIORITY+1,         // Prioridad de la tarea
-           0                     // Puntero a la tarea creada en el sistema
-        );
-
-   // Gestión de errores
-   configASSERT( res == pdPASS );
 }
 
 // keys_ Update State Function
@@ -194,10 +197,6 @@ static void buttonPressed( keyMap_t index )
 	taskENTER_CRITICAL();
 	keys_data[index].time_down = current_tick_count;
 	taskEXIT_CRITICAL();
-
-	if( index == TEC2_IDX ) {
-	   clear_diff( TEC1_IDX );
-	}
 }
 
 /* accion de el evento de tecla liberada */
@@ -219,20 +218,38 @@ static void keys_ButtonError( keyMap_t index )
 }
 
 /*=====[Implementations of private functions]=================================*/
-void task_tecla_1( void* taskParmPtr )
+void task_teclas( void* taskParmPtr )
 {
+   TickType_t dif;
+
 	while( 1 )
 	{
 		keys_Update( TEC1_IDX );
+
+		dif = get_diff( TEC1_IDX );
+
+      if( dif != KEYS_INVALID_TIME ) {
+         xSemaphoreTake(mutex, portMAX_DELAY);
+         c1 += dif;
+         if( c1 > 1900 ) c1 = 1900;
+         xSemaphoreGive(mutex);
+
+         clear_diff( TEC1_IDX );
+      }
+
+      keys_Update( TEC2_IDX );
+
+      dif = get_diff( TEC2_IDX );
+
+      if( dif != KEYS_INVALID_TIME ) {
+         xSemaphoreTake(mutex, portMAX_DELAY);
+         c1 -= dif;
+         if( c1 < 100 ) c1 = 100;
+         xSemaphoreGive(mutex);
+
+         clear_diff( TEC2_IDX );
+      }
+
 		vTaskDelay( DEBOUNCE_TIME / portTICK_RATE_MS );
 	}
-}
-
-void task_tecla_2( void* taskParmPtr )
-{
-   while( 1 )
-   {
-      keys_Update( TEC2_IDX );
-      vTaskDelay( DEBOUNCE_TIME / portTICK_RATE_MS );
-   }
 }
