@@ -78,7 +78,7 @@ TickType_t get_diff( keyMap_t index )
 void clear_diff( keyMap_t index )
 {
 	taskENTER_CRITICAL();
-	keys_data[0].time_diff = KEYS_INVALID_TIME;
+	keys_data[index].time_diff = KEYS_INVALID_TIME;
 	taskEXIT_CRITICAL();
 }
 
@@ -90,6 +90,11 @@ void keys_Init( void )
 	keys_data[0].time_down      = KEYS_INVALID_TIME;
 	keys_data[0].time_up        = KEYS_INVALID_TIME;
 	keys_data[0].time_diff      = KEYS_INVALID_TIME;
+
+	keys_data[1].state          = BUTTON_UP;  // Set initial state
+   keys_data[1].time_down      = KEYS_INVALID_TIME;
+   keys_data[1].time_up        = KEYS_INVALID_TIME;
+   keys_data[1].time_diff      = KEYS_INVALID_TIME;
 
 	// Crear tareas en freeRTOS
 	res = xTaskCreate (
