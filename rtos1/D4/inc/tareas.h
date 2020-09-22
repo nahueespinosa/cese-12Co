@@ -21,10 +21,12 @@
 #define C1_INITIAL_VALUE_MS   500
 #define C1_MIN_VALUE_MS       100
 #define C1_MAX_VALUE_MS       1900
+#define C1_DECREMENT_STEP_MS  100
 
 #define C1_INITIAL_VALUE      pdMS_TO_TICKS(C1_INITIAL_VALUE_MS)
 #define C1_MIN_VALUE          pdMS_TO_TICKS(C1_MIN_VALUE_MS)
 #define C1_MAX_VALUE          pdMS_TO_TICKS(C1_MAX_VALUE_MS)
+#define C1_DECREMENT_STEP     pdMS_TO_TICKS(C1_DECREMENT_STEP_MS)
 
 /*==================[definiciones de datos]=========================*/
 

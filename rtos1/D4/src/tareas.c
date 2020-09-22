@@ -37,7 +37,7 @@ void tasks_init( void ) {
    keys_Init();
 
    c1_mutex = xSemaphoreCreateMutex();
-   c1 = C1_INITIAL_VALUE;
+   c1 = C1_INITIAL_VALUE;        // Valor inicial de C1
 
    configASSERT( c1_mutex != NULL );
 
@@ -94,11 +94,13 @@ void task_teclas( void* taskParmPtr )
       // Actualiza estado de la tecla 1
       keys_Update( KEY1 );
 
+      // Mide el tiempo de pulsación aplicando anti-rebote
       dif = get_diff( KEY1 );
 
       if( dif != KEYS_INVALID_TIME ) {
          xSemaphoreTake(c1_mutex, portMAX_DELAY);
 
+         // Si la tecla 1 se suelta, incrementa el contador C1
          if( c1 + dif > C1_MAX_VALUE ) {
             c1 = C1_MAX_VALUE;
          } else {
@@ -113,11 +115,13 @@ void task_teclas( void* taskParmPtr )
       // Actualiza estado de la tecla 2
       keys_Update( KEY2 );
 
+      // Mide el tiempo de pulsación aplicando anti-rebote
       dif = get_diff( KEY2 );
 
       if( dif != KEYS_INVALID_TIME ) {
          xSemaphoreTake(c1_mutex, portMAX_DELAY);
 
+         // Si la tecla 2 se suelta, decrementa el contador C1
          if( c1 < C1_MIN_VALUE + dif ) {
             c1 = C1_MIN_VALUE;
          } else {
@@ -143,6 +147,7 @@ void task_led_1( void* taskParmPtr )
       xTime = c1;
       xSemaphoreGive( c1_mutex );
 
+      // Destella el led 1 con un período fijo de C1 (duty 50%)
       gpioToggle( LED1 );
       vTaskDelay( xTime );
    }
@@ -157,8 +162,16 @@ void task_led_2( void* taskParmPtr )
    {
       xSemaphoreTake( c1_mutex, portMAX_DELAY );
       xTime = c1 * 2;
+
+      // En cada ciclo decrementa C1 en 100
+      if( c1 < C1_MIN_VALUE + C1_DECREMENT_STEP ) {
+         c1 = C1_MIN_VALUE;
+      } else {
+         c1 -= C1_DECREMENT_STEP;
+      }
       xSemaphoreGive( c1_mutex );
 
+      // Destella el led 2 con un período de 2 segundos y un tiempo de encendido de 2*C1
       gpioWrite( LED2, ON );
       vTaskDelay( xTime );
       gpioWrite( LED2, OFF );
