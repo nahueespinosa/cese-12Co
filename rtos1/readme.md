@@ -49,3 +49,15 @@ Los ejecicios son compatibles con el framework firmware v3 (https://github.com/e
 | D_3 | printf conflictivo | Explicado en clase |
 | D_4 | Acceso a un módulo desde varias tareas | OBLIGATORIO |
 | D_5 |  Inversión de prioridades | Explicado en clase |
+
+
+### Guia E
+| Ejercicio | Descripción | Tipo |
+| :-: | :-: | :-: |
+| E_1 | Pasaje de dato por copia | Explicado en clase |
+| E_2 | Lectura no bloqueante de cola| Explicado en clase |
+| E_3 | Pasaje de datos por referencia | OBLIGATORIO |
+| E_4 | Exclusión mutua de recurso compartido| Explicado en clase |
+| E_5 | Comunicación bidireccional | Explicado en clase |
+| E_6 | Pasaje por dos colas | Explicado en clase |
+
