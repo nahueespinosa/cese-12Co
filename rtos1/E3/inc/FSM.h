@@ -42,6 +42,11 @@ typedef struct
 	QueueHandle_t queue_tec_pulsada;
 } tLedTecla;
 
+typedef struct
+{
+   gpioMap_t led;
+   TickType_t tiempo_medido;
+} tMensaje;
 
 /*==================[prototipos de funciones]====================*/
 TickType_t get_diff();

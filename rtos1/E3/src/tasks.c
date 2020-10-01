@@ -42,13 +42,20 @@ void tarea_led( void* taskParmPtr )
 	TickType_t xLastWakeTime = xTaskGetTickCount();
     // ---------- REPETIR POR SIEMPRE --------------------------
 
+	tMensaje *mensaje = NULL;
 	TickType_t dif = 0;
 	while( TRUE )
 	{
-		xQueueReceive( config->queue_tec_pulsada , &dif, 0);
+		xQueueReceive( config->queue_tec_pulsada , &mensaje, 0);
+
+		if( mensaje != NULL ) {
+         dif = mensaje->tiempo_medido;
+         vPortFree(mensaje);
+         mensaje = NULL;
+		}
 
 		if (dif > xPeriodicity)
-			dif = xPeriodicity;
+		   dif = xPeriodicity;
 
 		gpioWrite( config->led  , ON );
 		vTaskDelay( dif );
