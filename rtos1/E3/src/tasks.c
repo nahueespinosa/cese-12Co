@@ -35,32 +35,32 @@ void tarea_tecla( void* taskParmPtr )
 
 void tarea_led( void* taskParmPtr )
 {
-    // ---------- CONFIGURACIONES ------------------------------
-	tLedTecla* config = (tLedTecla*) taskParmPtr;
+   // ---------- CONFIGURACIONES ------------------------------
+   tLedTecla* config = (tLedTecla*) taskParmPtr;
 
-	TickType_t xPeriodicity =  MAX_RATE;
-	TickType_t xLastWakeTime = xTaskGetTickCount();
-    // ---------- REPETIR POR SIEMPRE --------------------------
+   TickType_t xPeriodicity =  MAX_RATE;
+   TickType_t xLastWakeTime = xTaskGetTickCount();
+   // ---------- REPETIR POR SIEMPRE --------------------------
 
-	tMensaje *mensaje = NULL;
-	TickType_t dif = 0;
-	while( TRUE )
-	{
-		xQueueReceive( config->queue_tec_pulsada , &mensaje, 0);
+   tMensaje *mensaje = NULL;
+   TickType_t dif = 0;
+   while( TRUE )
+   {
+      xQueueReceive( config->queue_tec_pulsada , &mensaje, 0);
 
-		if( mensaje != NULL ) {
+      if( mensaje != NULL ) {
          dif = mensaje->tiempo_medido;
          vPortFree(mensaje);
          mensaje = NULL;
-		}
+      }
 
-		if (dif > xPeriodicity)
-		   dif = xPeriodicity;
+      if (dif > xPeriodicity)
+         dif = xPeriodicity;
 
-		gpioWrite( config->led  , ON );
-		vTaskDelay( dif );
-		gpioWrite( config->led  , OFF );
+      gpioWrite( config->led  , ON );
+      vTaskDelay( dif );
+      gpioWrite( config->led  , OFF );
 
-		vTaskDelayUntil( &xLastWakeTime , xPeriodicity );
-	}
+      vTaskDelayUntil( &xLastWakeTime , xPeriodicity );
+   }
 }

@@ -29,17 +29,17 @@ void buttonReleased( tLedTecla* config )
 {
    tMensaje *mensaje = NULL;
 
-	config->tiempo_medido = xTaskGetTickCount() - config->tiempo_down;
+   config->tiempo_medido = xTaskGetTickCount() - config->tiempo_down;
 
-	if (config->tiempo_medido > 0) {
-	   mensaje = pvPortMalloc(sizeof(tMensaje));
+   if (config->tiempo_medido > 0) {
+      mensaje = pvPortMalloc(sizeof(tMensaje));
 
-	   if( mensaje != NULL ) {
-	      mensaje->led = config->led;
+      if( mensaje != NULL ) {
+         mensaje->led = config->led;
          mensaje->tiempo_medido = config->tiempo_medido;
          xQueueSend( config->queue_tec_pulsada , &mensaje,  portMAX_DELAY  );
-	   }
-	}
+      }
+   }
 }
 
 void fsmButtonError( tLedTecla* config )
