@@ -54,7 +54,7 @@ void tecla_led_init(void)
 		tecla_led_config[i].sem_tec_pulsada = xSemaphoreCreateCounting( MAX_SEM , 0 );
 
 		// Gestion de errores de semaforos
-		if( tecla_led_config[i].sem_tec_pulsada == pdFALSE)
+		if( tecla_led_config[i].sem_tec_pulsada == NULL)
 		{
 			gpioWrite( LED_ERROR , ON );
 			printf( MSG_ERROR_SEM );

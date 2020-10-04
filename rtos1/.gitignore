@@ -1,19 +1,15 @@
-A1/out/*
-A2/out/*
-A3/out/*
+**/out/*
 
-B1/out/*
-B2/out/*
-B3/out/*
-B4/out/*
-B5/out/*
-B6/out/*
-B7/out/*
-B8/out/*
 
+<<<<<<< Updated upstream
+ 
+=======
+<<<<<<< HEAD
 C1/out/*
 C2/out/*
 C3/out/*
 C4/out/*
 C5/out/*
 C6/out/*
+
+

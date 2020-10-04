@@ -127,7 +127,7 @@ void tecla_led_init(void)
 		tecla_led_config[i].sem_tec_pulsada = xSemaphoreCreateBinary();
 
 		// Gestion de errores de semaforos
-		if( tecla_led_config[i].sem_tec_pulsada == pdFALSE)
+		if( tecla_led_config[i].sem_tec_pulsada == NULL)
 		{
 			gpioWrite( LEDR, ON );
 			printf( "Error al crear los semaforos.\r\n" );

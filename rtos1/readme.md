@@ -61,3 +61,10 @@ Los ejecicios son compatibles con el framework firmware v3 (https://github.com/e
 | E_5 | Comunicación bidireccional | Explicado en clase |
 | E_6 | Pasaje por dos colas | Explicado en clase |
 
+### Guia F
+| Ejercicio | Descripción | Tipo |
+| :-: | :-: | :-: |
+| F_1 | Uso de tecla con interrupciones + semáforo | Explicado en clase |
+| F_2 | Uso de teclas con interrupciones + semáforo | OBLIGATORIO |
+| F_3 | Uso de teclas con interrupciones + cola | Explicado en clase |
+| F_4 | UART: recepción y transmisión usando interrupción utilizando semáforo | Se explicado en clase 6 |

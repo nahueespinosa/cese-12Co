@@ -84,7 +84,7 @@ int main( void )
 	sem_tec_pulsada = xSemaphoreCreateBinary();
 
 	// Gestion de errores de semaforos
-	if( sem_tec_pulsada == pdFALSE)
+	if( sem_tec_pulsada == NULL)
 	{
 		gpioWrite( LEDR, ON );
 		printf( "Error al crear los semaforos.\r\n" );
