@@ -67,4 +67,4 @@ Los ejecicios son compatibles con el framework firmware v3 (https://github.com/e
 | F_1 | Uso de tecla con interrupciones + semáforo | Explicado en clase |
 | F_2 | Uso de teclas con interrupciones + semáforo | OBLIGATORIO |
 | F_3 | Uso de teclas con interrupciones + cola | Explicado en clase |
-| F_4 | UART: recepción y transmisión usando interrupción utilizando semáforo | Se explicado en clase 6 |
+| F_4 | UART: recepción y transmisión usando interrupción utilizando semáforo | Se explicara en clase 7 |
