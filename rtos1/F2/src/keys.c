@@ -58,10 +58,6 @@ const t_key_config  keys_config[] = { [TEC1_INDEX]= {TEC1}, [TEC2_INDEX]= {TEC2}
 
 t_key_data keys_data[key_count];
 
-#if KEYS_USE_ISR==1
-SemaphoreHandle_t isr_signal;   //almacenara el handle del semaforo creado para una cierta tecla
-#endif
-
 /*=====[prototype of private functions]=================================*/
 void task_tecla( void* taskParmPtr );
 
@@ -282,20 +278,13 @@ void keys_Update_Isr( uint32_t index )
 /* accion de el evento de tecla pulsada */
 static void buttonPressed( uint32_t index )
 {
-    TickType_t current_tick_count = xTaskGetTickCount();
 
-    taskENTER_CRITICAL();
-    keys_data[index].time_down = current_tick_count;
-    taskEXIT_CRITICAL();
 }
 
 /* accion de el evento de tecla liberada */
 static void buttonReleased( uint32_t index )
 {
-    TickType_t current_tick_count = xTaskGetTickCount();
-
     taskENTER_CRITICAL();
-    keys_data[index].time_up    = current_tick_count;
     keys_data[index].time_diff  = keys_data[index].time_up - keys_data[index].time_down;
     taskEXIT_CRITICAL();
 
