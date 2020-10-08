@@ -52,7 +52,7 @@ static void buttonReleased( uint32_t index );
 
 /*=====[Definitions of public global variables]==============================*/
 
-const t_key_config  keys_config[] = { [TEC1_INDEX]= {TEC1} } ;
+const t_key_config  keys_config[] = { [TEC1_INDEX]= {TEC1}, [TEC2_INDEX]= {TEC2}, [TEC3_INDEX]= {TEC3}, [TEC4_INDEX]= {TEC4} } ;
 
 #define key_count   sizeof(keys_config)/sizeof(keys_config[TEC1_INDEX])
 
@@ -66,21 +66,21 @@ SemaphoreHandle_t isr_signal;   //almacenara el handle del semaforo creado para 
 void task_tecla( void* taskParmPtr );
 
 /*=====[Implementations of public functions]=================================*/
-TickType_t get_diff()
+TickType_t get_diff( uint32_t index )
 {
     TickType_t tiempo;
 
     taskENTER_CRITICAL();
-    tiempo = keys_data[TEC1_INDEX].time_diff;
+    tiempo = keys_data[index].time_diff;
     taskEXIT_CRITICAL();
 
     return tiempo;
 }
 
-void clear_diff()
+void clear_diff( uint32_t index )
 {
     taskENTER_CRITICAL();
-    keys_data[TEC1_INDEX].time_diff = 0;
+    keys_data[index].time_diff = 0;
     taskEXIT_CRITICAL();
 }
 
@@ -100,36 +100,40 @@ int key_pressed( uint32_t index )
 
 void keys_Init( void )
 {
+    uint32_t i;
     BaseType_t res;
 
-    //extender para N teclas
-    keys_data[TEC1_INDEX].state          = BUTTON_UP;  // Set initial state
-    keys_data[TEC1_INDEX].time_down      = KEYS_INVALID_TIME;
-    keys_data[TEC1_INDEX].time_up        = KEYS_INVALID_TIME;
-    keys_data[TEC1_INDEX].time_diff      = KEYS_INVALID_TIME;
+    for( i = 0 ; i < key_count ; i++ ) {
+       keys_data[i].state          = BUTTON_UP;  // Set initial state
+       keys_data[i].time_down      = KEYS_INVALID_TIME;
+       keys_data[i].time_up        = KEYS_INVALID_TIME;
+       keys_data[i].time_diff      = KEYS_INVALID_TIME;
 
-    keys_data[TEC1_INDEX].isr_signal    = xSemaphoreCreateBinary();
-    keys_data[TEC1_INDEX].pressed_signal    = xSemaphoreCreateBinary();
+       keys_data[i].isr_signal     = xSemaphoreCreateBinary();
+       keys_data[i].pressed_signal = xSemaphoreCreateBinary();
 
-    configASSERT( keys_data[TEC1_INDEX].isr_signal != NULL );
-    configASSERT( keys_data[TEC1_INDEX].pressed_signal != NULL );
+       configASSERT( keys_data[i].isr_signal != NULL );
+       configASSERT( keys_data[i].pressed_signal != NULL );
 
-    // Crear tareas en freeRTOS
-    res = xTaskCreate (
-              task_tecla,					// Funcion de la tarea a ejecutar
-              ( const char * )"task_tecla",	// Nombre de la tarea como String amigable para el usuario
-              configMINIMAL_STACK_SIZE*4,	// Cantidad de stack de la tarea
-              0,							// Parametros de tarea
-              tskIDLE_PRIORITY+1,			// Prioridad de la tarea
-              0							// Puntero a la tarea creada en el sistema
-          );
+       // Crear tareas en freeRTOS
+       res = xTaskCreate (
+           task_tecla,              // Funcion de la tarea a ejecutar
+           ( const char * )"task_tecla",   // Nombre de la tarea como String amigable para el usuario
+           configMINIMAL_STACK_SIZE*2, // Cantidad de stack de la tarea
+           (void *)i,                    // Parametros de tarea
+           tskIDLE_PRIORITY+1,         // Prioridad de la tarea
+           0                     // Puntero a la tarea creada en el sistema
+       );
+
+       // Gestión de errores
+       configASSERT( res == pdPASS );
+
+    }
 
 #if KEYS_USE_ISR==1
     keys_isr_config();
 #endif
 
-    // Gestión de errores
-    configASSERT( res == pdPASS );
 }
 
 #if KEYS_USE_ISR==0
@@ -295,7 +299,7 @@ static void buttonReleased( uint32_t index )
     keys_data[index].time_diff  = keys_data[index].time_up - keys_data[index].time_down;
     taskEXIT_CRITICAL();
 
-    xSemaphoreGive( keys_data[TEC1_INDEX].pressed_signal ) ;
+    xSemaphoreGive( keys_data[index].pressed_signal ) ;
 }
 
 static void keys_ButtonError( uint32_t index )
@@ -308,13 +312,15 @@ static void keys_ButtonError( uint32_t index )
 /*=====[Implementations of private functions]=================================*/
 void task_tecla( void* taskParmPtr )
 {
+    uint32_t index = (uint32_t)taskParmPtr;
+
     while( 1 )
     {
 #if KEYS_USE_ISR==0
         keys_Update( TEC1_INDEX );
         vTaskDelay( DEBOUNCE_TIME / portTICK_RATE_MS );
 #else
-        keys_Update_Isr( TEC1_INDEX );
+        keys_Update_Isr( index );
         vTaskDelay( DEBOUNCE_TIME / portTICK_RATE_MS );
 #endif
 
@@ -353,13 +359,13 @@ void keys_isr_config( void )
     Chip_PININT_SetPinModeEdge( LPC_GPIO_PIN_INT, PININTCH1 ); //Se configura el canal para que se active por flanco
     Chip_PININT_EnableIntHigh( LPC_GPIO_PIN_INT, PININTCH1 ); //En este caso el flanco es de subida
 
-#if 0
+#if 1
     // TEC2 FALL
     Chip_SCU_GPIOIntPinSel( 2, 0, 8 );
     Chip_PININT_SetPinModeEdge( LPC_GPIO_PIN_INT, PININTCH2 );
     Chip_PININT_EnableIntLow( LPC_GPIO_PIN_INT, PININTCH2 );
 
-    // TEC1 RISE
+    // TEC2 RISE
     Chip_SCU_GPIOIntPinSel( 3, 0, 8 );
     Chip_PININT_SetPinModeEdge( LPC_GPIO_PIN_INT, PININTCH3 );
     Chip_PININT_EnableIntHigh( LPC_GPIO_PIN_INT, PININTCH3 );
@@ -369,7 +375,7 @@ void keys_isr_config( void )
     Chip_PININT_SetPinModeEdge( LPC_GPIO_PIN_INT, PININTCH4 );
     Chip_PININT_EnableIntLow( LPC_GPIO_PIN_INT, PININTCH4 );
 
-    // TEC1 RISE
+    // TEC3 RISE
     Chip_SCU_GPIOIntPinSel( 5, 0, 9 );
     Chip_PININT_SetPinModeEdge( LPC_GPIO_PIN_INT, PININTCH5 );
     Chip_PININT_EnableIntHigh( LPC_GPIO_PIN_INT, PININTCH5 );
@@ -383,7 +389,6 @@ void keys_isr_config( void )
     Chip_SCU_GPIOIntPinSel( 7, 1, 9 );
     Chip_PININT_SetPinModeEdge( LPC_GPIO_PIN_INT, PININTCH7 );
     Chip_PININT_EnableIntHigh( LPC_GPIO_PIN_INT, PININTCH7 );
-
 #endif
 
     //Una vez que se han configurado los eventos para cada canal de interrupcion
@@ -393,7 +398,7 @@ void keys_isr_config( void )
     NVIC_SetPriority( PIN_INT1_IRQn, configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY );
     NVIC_EnableIRQ( PIN_INT1_IRQn );
 
-#if 0
+#if 1
     NVIC_SetPriority( PIN_INT2_IRQn, configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY );
     NVIC_EnableIRQ( PIN_INT2_IRQn );
     NVIC_SetPriority( PIN_INT3_IRQn, configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY );
@@ -421,7 +426,7 @@ void keys_isr_fall( uint32_t index )
     /* esta operacion debe realizarse en zona critica. Recordar que el objeto global puede estar leyendose
        o escribiendose en otro contexto  */
     uxSavedInterruptStatus = taskENTER_CRITICAL_FROM_ISR();
-    keys_data[TEC1_INDEX].time_down = xTaskGetTickCountFromISR();
+    keys_data[index].time_down = xTaskGetTickCountFromISR();
     taskEXIT_CRITICAL_FROM_ISR( uxSavedInterruptStatus );
 
 }
@@ -438,7 +443,7 @@ void keys_isr_rise( uint32_t index )
     /* esta operacion debe realizarse en zona critica. Recordar que el objeto global puede estar leyendose
        o escribiendose en otro contexto  */
     uxSavedInterruptStatus = taskENTER_CRITICAL_FROM_ISR();
-    keys_data[TEC1_INDEX].time_up = xTaskGetTickCountFromISR();
+    keys_data[index].time_up = xTaskGetTickCountFromISR();
     taskEXIT_CRITICAL_FROM_ISR( uxSavedInterruptStatus );
 }
 
@@ -470,11 +475,11 @@ void GPIO1_IRQHandler( void )  //asociado a tec1
 
         xSemaphoreGiveFromISR( keys_data[TEC1_INDEX].isr_signal, &xHigherPriorityTaskWoken );
     }
+
     portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
 }
 
-
-#if 0
+#if 1
 void GPIO2_IRQHandler( void )
 {
     UBaseType_t uxSavedInterruptStatus;
@@ -484,13 +489,13 @@ void GPIO2_IRQHandler( void )
     {
         Chip_PININT_ClearIntStatus( LPC_GPIO_PIN_INT, PININTCH2 ); //Borramos el flag de interrupciÃ³n
 
-        /* proceso */
+        keys_isr_fall( TEC2_INDEX );
+
+        xSemaphoreGiveFromISR( keys_data[TEC2_INDEX].isr_signal, &xHigherPriorityTaskWoken );
     }
 
     portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
 }
-
-
 
 void GPIO3_IRQHandler( void )
 {
@@ -501,7 +506,9 @@ void GPIO3_IRQHandler( void )
         Chip_PININT_ClearIntStatus( LPC_GPIO_PIN_INT, PININTCH3 );
         //codigo a ejecutar si ocurriÃ³ la interrupciÃ³n
 
-        /* proceso */
+        keys_isr_rise( TEC2_INDEX );
+
+        xSemaphoreGiveFromISR( keys_data[TEC2_INDEX].isr_signal, &xHigherPriorityTaskWoken );
     }
     portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
 }
@@ -515,7 +522,9 @@ void GPIO4_IRQHandler( void )
     {
         Chip_PININT_ClearIntStatus( LPC_GPIO_PIN_INT, PININTCH4 ); //Borramos el flag de interrupciÃ³n
 
-        /* proceso */
+        keys_isr_fall( TEC3_INDEX );
+
+        xSemaphoreGiveFromISR( keys_data[TEC3_INDEX].isr_signal, &xHigherPriorityTaskWoken );
     }
 
     portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
@@ -529,7 +538,9 @@ void GPIO5_IRQHandler( void )
     {
         Chip_PININT_ClearIntStatus( LPC_GPIO_PIN_INT, PININTCH5 );
 
-        /* proceso */
+        keys_isr_rise( TEC3_INDEX );
+
+        xSemaphoreGiveFromISR( keys_data[TEC3_INDEX].isr_signal, &xHigherPriorityTaskWoken );
     }
     portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
 }
@@ -542,7 +553,9 @@ void GPIO6_IRQHandler( void )
     {
         Chip_PININT_ClearIntStatus( LPC_GPIO_PIN_INT, PININTCH6 ); //Borramos el flag de interrupciÃ³n
 
-        /* proceso */
+        keys_isr_fall( TEC4_INDEX );
+
+        xSemaphoreGiveFromISR( keys_data[TEC4_INDEX].isr_signal, &xHigherPriorityTaskWoken );
     }
 
     portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
@@ -556,11 +569,12 @@ void GPIO7_IRQHandler( void )
     {
         Chip_PININT_ClearIntStatus( LPC_GPIO_PIN_INT, PININTCH7 );
 
-        /* proceso */
+        keys_isr_rise( TEC4_INDEX );
+
+        xSemaphoreGiveFromISR( keys_data[TEC4_INDEX].isr_signal, &xHigherPriorityTaskWoken );
     }
     portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
 }
-
 #endif
 
 #endif

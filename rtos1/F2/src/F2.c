@@ -44,64 +44,68 @@
 
 // Prototipo de funcion de la tarea
 void task_led( void* taskParmPtr );
-void task_tecla( void* taskParmPtr );
 
 /*=====[Definitions of public global variables]==============================*/
+
+gpioMap_t leds[] = { [TEC1_INDEX]=LEDB, [TEC2_INDEX]=LED1, [TEC3_INDEX]=LED2, [TEC4_INDEX]=LED3};
+#define leds_count   sizeof(leds)/sizeof(leds[0])
 
 /*=====[Main function, program entry point after power on or reset]==========*/
 
 int main( void )
 {
-    BaseType_t res;
+   uint32_t i;
+   BaseType_t res;
 
-    // ---------- CONFIGURACIONES ------------------------------
-    boardConfig();  // Inicializar y configurar la plataforma
+   // ---------- CONFIGURACIONES ------------------------------
+   boardConfig();  // Inicializar y configurar la plataforma
 
-    printf( "Ejercicio F2\n" );
+   printf( "Ejercicio F2\n" );
 
-    // Crear tareas en freeRTOS
-    res = xTaskCreate (
-              task_led,					// Funcion de la tarea a ejecutar
-              ( const char * )"task_led",	// Nombre de la tarea como String amigable para el usuario
-              configMINIMAL_STACK_SIZE*4,	// Cantidad de stack de la tarea
-              0,							// Parametros de tarea
-              tskIDLE_PRIORITY+1,			// Prioridad de la tarea
-              0							// Puntero a la tarea creada en el sistema
-          );
+   for( i = 0 ; i < leds_count ; i++ ) {
+      // Crear tareas en freeRTOS
+      res = xTaskCreate (
+         task_led,					// Funcion de la tarea a ejecutar
+         ( const char * )"task_led",	// Nombre de la tarea como String amigable para el usuario
+         configMINIMAL_STACK_SIZE*2,	// Cantidad de stack de la tarea
+         (void*)i,							// Parametros de tarea
+         tskIDLE_PRIORITY+1,			// Prioridad de la tarea
+         0							// Puntero a la tarea creada en el sistema
+      );
 
-    // Gestión de errores
-    configASSERT( res == pdPASS );
+      // Gestión de errores
+      configASSERT( res == pdPASS );
+   }
 
-    /* inicializo driver de teclas */
-    keys_Init();
+   /* inicializo driver de teclas */
+   keys_Init();
 
-    // Iniciar scheduler
-    vTaskStartScheduler();					// Enciende tick | Crea idle y pone en ready | Evalua las tareas creadas | Prioridad mas alta pasa a running
+   // Iniciar scheduler
+   vTaskStartScheduler();					// Enciende tick | Crea idle y pone en ready | Evalua las tareas creadas | Prioridad mas alta pasa a running
 
-    /* realizar un assert con "false" es equivalente al while(1) */
-    configASSERT( 0 );
-    return 0;
+   /* realizar un assert con "false" es equivalente al while(1) */
+   configASSERT( 0 );
+   return 0;
 }
 
 void task_led( void* taskParmPtr )
 {
+    uint32_t index = (uint32_t) taskParmPtr;
     TickType_t dif =   pdMS_TO_TICKS( 500 );
-    int tecla_presionada;
     TickType_t xPeriodicity = pdMS_TO_TICKS( 1000 ); // Tarea periodica cada 1000 ms
 
     TickType_t xLastWakeTime = xTaskGetTickCount();
 
     while( 1 )
     {
-        if( key_pressed( TEC1_INDEX ) )
+        if( key_pressed( index ) )
         {
-            dif = get_diff();
+            dif = get_diff( index );
         }
 
-        gpioWrite( LEDB, ON );
+        gpioWrite( leds[index], ON );
         vTaskDelay( dif );
-        gpioWrite( LEDB, OFF );
-
+        gpioWrite( leds[index], OFF );
 
         // Envia la tarea al estado bloqueado durante xPeriodicity (delay periodico)
         vTaskDelayUntil( &xLastWakeTime, 2*dif );
