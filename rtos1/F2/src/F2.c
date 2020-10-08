@@ -47,7 +47,7 @@ void task_led( void* taskParmPtr );
 
 /*=====[Definitions of public global variables]==============================*/
 
-gpioMap_t leds[] = { [TEC1_INDEX]=LEDB, [TEC2_INDEX]=LED1, [TEC3_INDEX]=LED2, [TEC4_INDEX]=LED3};
+const gpioMap_t leds[] = { [TEC1_INDEX]=LEDB, [TEC2_INDEX]=LED1, [TEC3_INDEX]=LED2, [TEC4_INDEX]=LED3};
 #define leds_count   sizeof(leds)/sizeof(leds[0])
 
 /*=====[Main function, program entry point after power on or reset]==========*/
