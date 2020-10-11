@@ -53,13 +53,12 @@
 #define vectorIn    r0
 #define vectorOut   r1
 #define longitud    r2
-#define escalar     r3
+#define window      r3
 #define i           r4
 #define j           r5
 #define k           r6
 #define valor       r7
 #define acumulador  r8
-#define window      r9
 
     /**
      * Indicamos que la siguiente subrutina debe ser ensamblada en modo thumb,
@@ -70,7 +69,7 @@
 
 
 filtroVentana10InAsm:
-    push    {r4-r9,lr}
+    push    {r4-r8,lr}
 
     mov     i, #0
     mov     window, #10
@@ -95,4 +94,4 @@ loop_j:
     cmp     longitud, i
     bne     loop_i
 
-    pop     {r4-r9,pc}   /* retorno */
+    pop     {r4-r8,pc}   /* retorno */
