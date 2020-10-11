@@ -1,5 +1,5 @@
 APP=arquitecturaDeMicroprocesadores
-PROGRAM=ejercicio10
+PROGRAM=ejercicio5
 VERBOSE=n
 OPT=g
 USE_NANO=y
