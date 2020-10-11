@@ -53,9 +53,8 @@
 #define vectorIn    r0
 #define vectorOut   r1
 #define longitud    r2
-#define escalar     r3
-#define indice      r4
-#define valorActual r5
+#define indice      r3
+#define valorActual r4
 
     /**
      * Indicamos que la siguiente subrutina debe ser ensamblada en modo thumb,
@@ -66,7 +65,7 @@
 
 
 pack32to16InAsm:
-    push    {r4,r5,lr}
+    push    {r4,lr}
 
     mov     indice, #0
 
@@ -79,4 +78,4 @@ loop:
     cmp     longitud, indice
     bne     loop
 
-    pop     {r4,r5,pc}   /* retorno */
+    pop     {r4,pc}   /* retorno */
