@@ -33,15 +33,14 @@
 
 #include <stdint.h>
 
-void productoEscalar12InC(uint16_t *vectorIn, uint16_t *vectorOut, uint32_t longitud, uint16_t escalar)
-{
-	uint32_t i;
+void productoEscalar12InC(uint16_t *vectorIn, uint16_t *vectorOut,
+      uint32_t longitud, uint16_t escalar) {
+   uint32_t i;
 
-	for (i = 0; i < longitud; i++ )
-	{
-		vectorOut[i] = vectorIn[i] * escalar;
-		if( vectorOut[i] > 0x0FFF ) {
-		   vectorOut[i] = 0x0FFF;
-		}
-	}
+   for (i = 0; i < longitud; i++) {
+      vectorOut[i] = vectorIn[i] * escalar;
+      if (vectorOut[i] > 0x0FFF) {
+         vectorOut[i] = 0x0FFF;
+      }
+   }
 }

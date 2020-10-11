@@ -31,53 +31,53 @@
  *
  */
 
-	/**
-	 * Directiva al ensablador que permite indicar que se encarga de buscar
-	 * la instruccion mas apropiada entre ARM y thumb2
-	 */
-	.syntax unified
+    /**
+     * Directiva al ensamblador que permite indicar que se encarga de buscar
+     * la instruccion mas apropiada entre ARM y thumb2
+     */
+    .syntax unified
 
-	/**
-	 * .text permite indicar una seccion de codigo.
-	 */
-	.text
+    /**
+     * .text permite indicar una seccion de codigo.
+     */
+    .text
 
-	/**
-	 * .global permite definir un simbolo exportable,
-	 * es decir que podemos verlo desde otros modulos (equivalente a extern).
+    /**
+     * .global permite definir un simbolo exportable,
+     * es decir que podemos verlo desde otros modulos (equivalente a extern).
      * Definimos la rutina como global para que sea visible desde otros modulos.
      */
-	.global productoEscalar12InAsm
+    .global productoEscalar12InAsm
 
 
 #define vectorIn    r0
-#define vectorOut 	r1
+#define vectorOut   r1
 #define longitud    r2
 #define escalar     r3
-#define indice 		r4
+#define indice      r4
 #define valorActual r5
 
-	/**
-	 * Indicamos que la siguiente subrutina debe ser ensamblada en modo thumb,
-	 * entonces en las direcciones en el ultimo bit tendran el 1 para que se reconozcan como en modo thumb.
-	 * Siempre hay que ponerla antes de la primer instruccion.
-	 */
-	.thumb_func
+    /**
+     * Indicamos que la siguiente subrutina debe ser ensamblada en modo thumb,
+     * entonces en las direcciones en el ultimo bit tendran el 1 para que se reconozcan como en modo thumb.
+     * Siempre hay que ponerla antes de la primer instruccion.
+     */
+    .thumb_func
 
 
 productoEscalar12InAsm:
-    push   {r4,r5,lr}
+    push    {r4,r5,lr}
 
-	mov    indice, #0
+    mov     indice, #0
 
 loop:
-    ldrh   valorActual,[vectorIn, indice, lsl 1]
-    mul    valorActual, valorActual, escalar
-    usat   valorActual, 12, valorActual
-	strh   valorActual,[vectorOut, indice, lsl 1]
+    ldrh    valorActual,[vectorIn, indice, lsl 1]
+    mul     valorActual, valorActual, escalar
+    usat    valorActual, 12, valorActual
+    strh    valorActual,[vectorOut, indice, lsl 1]
 
-	add    indice, 1
-	cmp    longitud, indice
-	bne    loop
+    add     indice, 1
+    cmp     longitud, indice
+    bne     loop
 
-	pop    {r4,r5,pc}   /* retorno */
+    pop     {r4,r5,pc}   /* retorno */

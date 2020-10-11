@@ -33,12 +33,11 @@
 
 #include <stdint.h>
 
-void productoEscalar32InC(uint32_t *vectorIn, uint32_t *vectorOut, uint32_t longitud, uint32_t escalar)
-{
-	uint32_t i = 0;
+void productoEscalar32InC(uint32_t *vectorIn, uint32_t *vectorOut,
+      uint32_t longitud, uint32_t escalar) {
+   uint32_t i = 0;
 
-	for (; i < longitud; i++ )
-	{
-		vectorOut[i] = vectorIn[i] * escalar;
-	}
+   for (; i < longitud; i++) {
+      vectorOut[i] = vectorIn[i] * escalar;
+   }
 }

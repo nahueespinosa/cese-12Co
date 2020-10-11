@@ -31,50 +31,50 @@
  *
  */
 
-	/**
-	 * Directiva al ensablador que permite indicar que se encarga de buscar
-	 * la instruccion mas apropiada entre ARM y thumb2
-	 */
-	.syntax unified
+    /**
+     * Directiva al ensablador que permite indicar que se encarga de buscar
+     * la instruccion mas apropiada entre ARM y thumb2
+     */
+    .syntax unified
 
-	/**
-	 * .text permite indicar una seccion de codigo.
-	 */
-	.text
+    /**
+     * .text permite indicar una seccion de codigo.
+     */
+    .text
 
-	/**
-	 * .global permite definir un simbolo exportable,
-	 * es decir que podemos verlo desde otros modulos (equivalente a extern).
+    /**
+     * .global permite definir un simbolo exportable,
+     * es decir que podemos verlo desde otros modulos (equivalente a extern).
      * Definimos la rutina como global para que sea visible desde otros modulos.
      */
-	.global zerosInAsm
+    .global zerosInAsm
 
 
-#define vector		r0
-#define longitud 	r1
-#define indice 		r2
-#define zero		r3
+#define vector      r0
+#define longitud    r1
+#define indice      r2
+#define zero        r3
 #define valorActual r4
 
-	/**
-	 * Indicamos que la siguiente subrutina debe ser ensamblada en modo thumb,
-	 * entonces en las direcciones en el ultimo bit tendran el 1 para que se reconozcan como en modo thumb.
-	 * Siempre hay que ponerla antes de la primer instruccion.
-	 */
-	.thumb_func
+    /**
+     * Indicamos que la siguiente subrutina debe ser ensamblada en modo thumb,
+     * entonces en las direcciones en el ultimo bit tendran el 1 para que se reconozcan como en modo thumb.
+     * Siempre hay que ponerla antes de la primer instruccion.
+     */
+    .thumb_func
 
 
 zerosInAsm:
-    push {r4,lr}  /* guardamos la direccion de retorno en la pila */
+    push    {r4,lr}  /* guardamos la direccion de retorno en la pila */
 
-	mov zero, 0
-	ldr zero, =0
-	ldr indice, =0
+    mov     zero, 0
+    ldr     zero, =0
+    ldr     indice, =0
 
 loop:
-	str zero,[vector, indice, LSL 2]
-	add indice,1
-	cmp longitud, indice
-	bne loop
+    str     zero,[vector, indice, LSL 2]
+    add     indice,1
+    cmp     longitud, indice
+    bne     loop
 
-	pop {r4,pc}   /* retorno */
+    pop     {r4,pc}   /* retorno */

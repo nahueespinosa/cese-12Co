@@ -42,70 +42,67 @@
 
 /*==================[internal data declaration]==============================*/
 
-volatile uint32_t * DWT_CTRL   = (uint32_t *)0xE0001000;
-volatile uint32_t * DWT_CYCCNT = (uint32_t *)0xE0001004;
+volatile uint32_t * DWT_CTRL = (uint32_t *) 0xE0001000;
+volatile uint32_t * DWT_CYCCNT = (uint32_t *) 0xE0001004;
 
 /*==================[external functions definition]==========================*/
 
 extern void addEchoInC(int16_t *vectorIn, int16_t *vectorOut, uint32_t longitud);
-extern void addEchoInAsm(int16_t *vectorIn, int16_t *vectorOut, uint32_t longitud);
-extern void addEchoInSIMD(int16_t *vectorIn, int16_t *vectorOut, uint32_t longitud);
+extern void addEchoInAsm(int16_t *vectorIn, int16_t *vectorOut,
+      uint32_t longitud);
+extern void addEchoInSIMD(int16_t *vectorIn, int16_t *vectorOut,
+      uint32_t longitud);
 
 /*==================[internal functions definition]==========================*/
 
-static void initHardware(void)
-{
+static void initHardware(void) {
    Board_Init();
    SystemCoreClockUpdate();
    //SysTick_Config(SystemCoreClock / 1000);
 }
 
+int main(void) {
+   volatile uint32_t cyclesC = 0, cyclesAsm = 0, cyclesSIMD = 0;
+   uint32_t resultC = 0, resultAsm = 0, resultSIMD = 0, i;
+   int16_t vectorIn[MAX_SIZE];
+   int16_t vectorOutEnC[MAX_SIZE];
+   int16_t vectorOutEnAsm[MAX_SIZE];
 
-int main(void)
-{
-	volatile uint32_t cyclesC=0,cyclesAsm=0,cyclesSIMD=0;
-	uint32_t resultC=0,resultAsm=0,resultSIMD=0, i;
-	int16_t vectorIn[MAX_SIZE];
-	int16_t vectorOutEnC[MAX_SIZE];
-	int16_t vectorOutEnAsm[MAX_SIZE];
+   //Inicializamos los vectores
+   //Hacemos vec[0] = 0, vec[1] = 1, etc
+   for (i = 0; i < MAX_SIZE; i++) {
+      vectorIn[i] = -300 + i;
+   }
 
-	//Inicializamos los vectores
-	//Hacemos vec[0] = 0, vec[1] = 1, etc
-	for (i=0; i < MAX_SIZE; i++)
-	{
-	   vectorIn[i] = -300 + i;
-	}
-
-	initHardware();
+   initHardware();
 
    // Activamos el conteo de ciclos
-	*DWT_CTRL |= 1;
+   *DWT_CTRL |= 1;
 
-	//Inicializamos en 0 el registro de cuentas de ciclos
-	*DWT_CYCCNT = 0;
-	//Invocamos a la funcion en C
-	addEchoInC(vectorIn, vectorOutEnC, MAX_SIZE);
-	//Nos guardamos en una variable el valor actual del contador de ciclos
-	cyclesC=*DWT_CYCCNT;
+   //Inicializamos en 0 el registro de cuentas de ciclos
+   *DWT_CYCCNT = 0;
+   //Invocamos a la funcion en C
+   addEchoInC(vectorIn, vectorOutEnC, MAX_SIZE);
+   //Nos guardamos en una variable el valor actual del contador de ciclos
+   cyclesC = *DWT_CYCCNT;
 
-	//Inicializamos en 0 el registro de cuentas de ciclos
-	*DWT_CYCCNT = 0;
-	//Invocamos a la función en ASM
-	//addEchoInAsm(vectorIn, vectorOutEnAsm, MAX_SIZE);
-	//Nos guardamos en una variable el valor actual del contador de ciclos
-	cyclesAsm=*DWT_CYCCNT;
+   //Inicializamos en 0 el registro de cuentas de ciclos
+   *DWT_CYCCNT = 0;
+   //Invocamos a la función en ASM
+   //addEchoInAsm(vectorIn, vectorOutEnAsm, MAX_SIZE);
+   //Nos guardamos en una variable el valor actual del contador de ciclos
+   cyclesAsm = *DWT_CYCCNT;
 
-	//Inicializamos en 0 el registro de cuentas de ciclos
+   //Inicializamos en 0 el registro de cuentas de ciclos
    *DWT_CYCCNT = 0;
    //Invocamos a la función con instrucciones SIMD
    addEchoInSIMD(vectorIn, vectorOutEnAsm, MAX_SIZE);
    //Nos guardamos en una variable el valor actual del contador de ciclos
-   cyclesSIMD=*DWT_CYCCNT;
+   cyclesSIMD = *DWT_CYCCNT;
 
-	while (1)
-	{
-		__WFI(); //wfi
-	}
+   while (1) {
+      __WFI(); //wfi
+   }
 }
 
 /** @} doxygen end group definition */

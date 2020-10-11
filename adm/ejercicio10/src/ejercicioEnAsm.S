@@ -31,30 +31,30 @@
  *
  */
 
-	/**
-	 * Directiva al ensablador que permite indicar que se encarga de buscar
-	 * la instruccion mas apropiada entre ARM y thumb2
-	 */
-	.syntax unified
+    /**
+     * Directiva al ensamblador que permite indicar que se encarga de buscar
+     * la instruccion mas apropiada entre ARM y thumb2
+     */
+    .syntax unified
 
-	/**
-	 * .text permite indicar una seccion de codigo.
-	 */
-	.text
+    /**
+     * .text permite indicar una seccion de codigo.
+     */
+    .text
 
-	/**
-	 * .global permite definir un simbolo exportable,
-	 * es decir que podemos verlo desde otros modulos (equivalente a extern).
+    /**
+     * .global permite definir un simbolo exportable,
+     * es decir que podemos verlo desde otros modulos (equivalente a extern).
      * Definimos la rutina como global para que sea visible desde otros modulos.
      */
-	.global addEchoInAsm
-	.global addEchoInSIMD
+    .global addEchoInAsm
+    .global addEchoInSIMD
 
 
 #define vectorIn    r0
-#define vectorOut 	r1
+#define vectorOut   r1
 #define longitud    r2
-#define indice 		r3
+#define indice      r3
 #define indiceEcho  r4
 #define valorActual r5
 #define valorEcho   r6
@@ -62,45 +62,45 @@
 #define divisor     r8
 #define cero        r8
 
-	/**
-	 * Indicamos que la siguiente subrutina debe ser ensamblada en modo thumb,
-	 * entonces en las direcciones en el ultimo bit tendran el 1 para que se reconozcan como en modo thumb.
-	 * Siempre hay que ponerla antes de la primer instruccion.
-	 */
-	.thumb_func
+    /**
+     * Indicamos que la siguiente subrutina debe ser ensamblada en modo thumb,
+     * entonces en las direcciones en el ultimo bit tendran el 1 para que se reconozcan como en modo thumb.
+     * Siempre hay que ponerla antes de la primer instruccion.
+     */
+    .thumb_func
 
 
 addEchoInAsm:
-    push {r4-r8,lr}  /* guardamos la direccion de retorno en la pila */
+    push    {r4-r8,lr}  /* guardamos la direccion de retorno en la pila */
 
-	mov    indice, #0
-	mov    indiceEcho, #0
-	mov    echoLong, #882
-	mov    divisor, #2
+    mov     indice, #0
+    mov     indiceEcho, #0
+    mov     echoLong, #882
+    mov     divisor, #2
 
 addEchoInAsm_loop_1:
-    ldrsh  valorActual,[vectorIn, indice, lsl 1]
-    strh   valorActual,[vectorOut, indice, lsl 1]
+    ldrsh   valorActual,[vectorIn, indice, lsl 1]
+    strh    valorActual,[vectorOut, indice, lsl 1]
 
-    add    indice, 1
-    cmp    indice, echoLong
-    bne    addEchoInAsm_loop_1
+    add     indice, 1
+    cmp     indice, echoLong
+    bne     addEchoInAsm_loop_1
 
 addEchoInAsm_loop_2:
-    ldrsh  valorActual,[vectorIn, indice, lsl 1]
-    ldrsh  valorEcho,[vectorIn, indiceEcho, lsl 1]
-    sdiv   valorEcho, divisor
-    add    valorActual, valorEcho
-    ssat   valorActual, 16, valorActual
-	strh   valorActual,[vectorOut, indice, lsl 1]
+    ldrsh   valorActual,[vectorIn, indice, lsl 1]
+    ldrsh   valorEcho,[vectorIn, indiceEcho, lsl 1]
+    sdiv    valorEcho, divisor
+    add     valorActual, valorEcho
+    ssat    valorActual, 16, valorActual
+    strh    valorActual,[vectorOut, indice, lsl 1]
 
-	add    indice, 1
-	add    indiceEcho, 1
+    add     indice, 1
+    add     indiceEcho, 1
 
-	cmp    longitud, indice
-    bne    addEchoInAsm_loop_2
+    cmp     longitud, indice
+    bne     addEchoInAsm_loop_2
 
-	pop    {r4-r8,pc}   /* retorno */
+    pop     {r4-r8,pc}   /* retorno */
 
 
 addEchoInSIMD:

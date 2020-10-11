@@ -33,17 +33,15 @@
 
 #include <stdint.h>
 
-void addEchoInC(int16_t *vectorIn, int16_t *vectorOut, uint32_t longitud)
-{
-	uint32_t i, j;
+void addEchoInC(int16_t *vectorIn, int16_t *vectorOut, uint32_t longitud) {
+   uint32_t i, j;
 
-	for( i = 0 ; i < 882 ; i++ ) {
-	   vectorOut[i] = vectorIn[i];
-	}
+   for (i = 0; i < 882; i++) {
+      vectorOut[i] = vectorIn[i];
+   }
 
-	for (j = 0; i < longitud ; i++ )
-	{
-		vectorOut[i] = vectorIn[i] + vectorIn[j] / 2;
-		j++;
-	}
+   for (j = 0; i < longitud; i++) {
+      vectorOut[i] = vectorIn[i] + vectorIn[j] / 2;
+      j++;
+   }
 }

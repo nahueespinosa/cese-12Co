@@ -42,60 +42,58 @@
 
 /*==================[internal data declaration]==============================*/
 
-volatile uint32_t * DWT_CTRL   = (uint32_t *)0xE0001000;
-volatile uint32_t * DWT_CYCCNT = (uint32_t *)0xE0001004;
+volatile uint32_t * DWT_CTRL = (uint32_t *) 0xE0001000;
+volatile uint32_t * DWT_CYCCNT = (uint32_t *) 0xE0001004;
 
 /*==================[external functions definition]==========================*/
 
-extern void productoEscalar12InC(uint16_t *vectorIn, uint16_t *vectorOut, uint32_t longitud, uint16_t escalar);
-extern void productoEscalar12InAsm(uint16_t *vectorIn, uint16_t *vectorOut, uint32_t longitud, uint16_t escalar);
+extern void productoEscalar12InC(uint16_t *vectorIn, uint16_t *vectorOut,
+      uint32_t longitud, uint16_t escalar);
+extern void productoEscalar12InAsm(uint16_t *vectorIn, uint16_t *vectorOut,
+      uint32_t longitud, uint16_t escalar);
 
 /*==================[internal functions definition]==========================*/
 
-static void initHardware(void)
-{
-	Board_Init();
-	SystemCoreClockUpdate();
-	//SysTick_Config(SystemCoreClock / 1000);
+static void initHardware(void) {
+   Board_Init();
+   SystemCoreClockUpdate();
+   //SysTick_Config(SystemCoreClock / 1000);
 }
 
-int main(void)
-{
-	volatile uint32_t cyclesC=0,cyclesAsm=0,cyclesSIMD=0;
-	uint32_t resultC=0,resultAsm=0,resultSIMD=0, i;
-	uint16_t vectorIn[MAX_SIZE];
-	uint16_t vectorOutEnC[MAX_SIZE];
-	uint16_t vectorOutEnAsm[MAX_SIZE];
+int main(void) {
+   volatile uint32_t cyclesC = 0, cyclesAsm = 0, cyclesSIMD = 0;
+   uint32_t resultC = 0, resultAsm = 0, resultSIMD = 0, i;
+   uint16_t vectorIn[MAX_SIZE];
+   uint16_t vectorOutEnC[MAX_SIZE];
+   uint16_t vectorOutEnAsm[MAX_SIZE];
 
-	//Inicializamos los vectores
-	for (i=0; i < MAX_SIZE; i++)
-	{
-	   vectorIn[i] = i * 6;
-	}
+   //Inicializamos los vectores
+   for (i = 0; i < MAX_SIZE; i++) {
+      vectorIn[i] = i * 6;
+   }
 
-	initHardware();
+   initHardware();
 
-	// Activamos el conteo de ciclos
-	*DWT_CTRL |= 1;
+   // Activamos el conteo de ciclos
+   *DWT_CTRL |= 1;
 
-	//Inicializamos en 0 el registro de cuentas de ciclos
-	*DWT_CYCCNT = 0;
-	//Invocamos a la funcion en C
-	productoEscalar12InC(vectorIn, vectorOutEnC, MAX_SIZE, 2);
-	//Nos guardamos en una variable el valor actual del contador de ciclos
-	cyclesC=*DWT_CYCCNT;
+   //Inicializamos en 0 el registro de cuentas de ciclos
+   *DWT_CYCCNT = 0;
+   //Invocamos a la funcion en C
+   productoEscalar12InC(vectorIn, vectorOutEnC, MAX_SIZE, 2);
+   //Nos guardamos en una variable el valor actual del contador de ciclos
+   cyclesC = *DWT_CYCCNT;
 
-	//Inicializamos en 0 el registro de cuentas de ciclos
-	*DWT_CYCCNT = 0;
-	//Invocamos a la función en ASM
-	productoEscalar12InAsm(vectorIn, vectorOutEnAsm, MAX_SIZE, 2);
-	//Nos guardamos en una variable el valor actual del contador de ciclos
-	cyclesAsm=*DWT_CYCCNT;
+   //Inicializamos en 0 el registro de cuentas de ciclos
+   *DWT_CYCCNT = 0;
+   //Invocamos a la función en ASM
+   productoEscalar12InAsm(vectorIn, vectorOutEnAsm, MAX_SIZE, 2);
+   //Nos guardamos en una variable el valor actual del contador de ciclos
+   cyclesAsm = *DWT_CYCCNT;
 
-	while (1)
-	{
-		__WFI(); //wfi
-	}
+   while (1) {
+      __WFI(); //wfi
+   }
 }
 
 /*==================[end of file]============================================*/
