@@ -55,11 +55,12 @@
 #define vectorCorr  r2
 #define longitud    r3
 #define l           r4
-#define n           r5
+#define i           r5
 #define acumulador  r6
 #define valorX      r7
 #define valorY      r8
-#define indiceY     r9
+#define j           r9
+#define aux         r10
 
     /**
      * Indicamos que la siguiente subrutina debe ser ensamblada en modo thumb,
@@ -70,27 +71,27 @@
 
 
 corrInAsm:
-    push    {r4-r9,lr}
+    push    {r4-r10,lr}
 
     mov     l, #0
 
 loop_l:
-    mov     n, #0
+    mov     i, #0
     mov     acumulador, #0
+    subs    j, longitud, l
 
 loop_n:
-    subs    indiceY, n, l
-    blt     continue
+    udiv    aux, j, longitud
+    mls     j, aux, longitud, j
 
-    ldrsh   valorX, [vectorX, n, LSL 1]
-    ldrsh   valorY, [vectorY, indiceY, LSL 1]
+    ldrsh   valorX, [vectorX, i, LSL 1]
+    ldrsh   valorY, [vectorY, j, LSL 1]
 
-    mul     valorX, valorX, valorY
-    add     acumulador, valorX
+    mla     acumulador, valorX, valorY, acumulador
 
-continue:
-    add     n, 1
-    cmp     n, longitud
+    add     j, 1
+    add     i, 1
+    cmp     i, longitud
     bne     loop_n
 
     str     acumulador, [vectorCorr, l, LSL 2]
@@ -99,4 +100,4 @@ continue:
     cmp     l, longitud
     bne     loop_l
 
-    pop     {r4-r9,pc}   /* retorno */
+    pop     {r4-r10,pc}   /* retorno */
