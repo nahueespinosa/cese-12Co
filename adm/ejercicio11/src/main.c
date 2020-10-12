@@ -72,7 +72,7 @@ int main(void) {
    //Inicializamos los vectores
    for (i = 0; i < MAX_SIZE; i++) {
       vectorX[i] = 60 * sin(i);
-      vectorY[i] = 60 * sin(i+8);
+      vectorY[i] = 60 * sin(i+6);
    }
 
    initHardware();

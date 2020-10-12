@@ -35,17 +35,19 @@
 
 void corrInC(int16_t *vectorX, int16_t *vectorY, int32_t *vectorCorr,
       uint32_t longitud) {
-   uint32_t l, n;
+   uint32_t i, j, l;
    int32_t acumulador;
 
    for (l = 0; l < longitud; l++) {
 
       acumulador = 0;
 
-      for (n = 0; n < longitud; n++) {
-         if (l <= n) {
-            acumulador += vectorX[n] * vectorY[n - l];
-         }
+      j = longitud - l;
+
+      for(i = 0 ; i < longitud ; i++ ) {
+         j %= longitud;
+         acumulador += vectorX[i] * vectorY[j];
+         j++;
       }
 
       vectorCorr[l] = acumulador;
