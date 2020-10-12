@@ -38,7 +38,7 @@
 
 /*==================[macros and definitions]=================================*/
 
-#define MAX_SIZE 2048
+#define MAX_SIZE 4096
 
 /*==================[internal data declaration]==============================*/
 
@@ -49,6 +49,7 @@ volatile uint32_t * DWT_CYCCNT = (uint32_t *) 0xE0001004;
 
 extern void invertirInC(uint16_t * vector, uint32_t longitud);
 extern void invertirInAsm(uint16_t * vector, uint32_t longitud);
+extern void invertirInSIMD(uint16_t * vector, uint32_t longitud);
 
 /*==================[internal functions definition]==========================*/
 
@@ -63,11 +64,13 @@ int main(void) {
    uint32_t resultC = 0, resultAsm = 0, resultSIMD = 0, i;
    uint16_t vectorEnC[MAX_SIZE];
    uint16_t vectorEnAsm[MAX_SIZE];
+   uint16_t vectorEnSIMD[MAX_SIZE];
 
    //Inicializamos los vectores
    for (i = 0; i < MAX_SIZE; i++) {
       vectorEnC[i] = i;
       vectorEnAsm[i] = i;
+      vectorEnSIMD[i] = i;
    }
 
    initHardware();
@@ -88,6 +91,13 @@ int main(void) {
    invertirInAsm(vectorEnAsm, MAX_SIZE);
    //Nos guardamos en una variable el valor actual del contador de ciclos
    cyclesAsm = *DWT_CYCCNT;
+
+   //Inicializamos en 0 el registro de cuentas de ciclos
+   *DWT_CYCCNT = 0;
+   //Invocamos a la función en ASM
+   invertirInSIMD(vectorEnSIMD, MAX_SIZE);
+   //Nos guardamos en una variable el valor actual del contador de ciclos
+   cyclesSIMD = *DWT_CYCCNT;
 
    while (1) {
       __WFI(); //wfi
