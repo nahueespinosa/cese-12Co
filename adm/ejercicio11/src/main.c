@@ -66,13 +66,13 @@ int main(void) {
    uint32_t resultC = 0, resultAsm = 0, resultSIMD = 0, i;
    int16_t vectorX[MAX_SIZE];
    int16_t vectorY[MAX_SIZE];
-   int32_t vectorCorrEnC[MAX_SIZE];
-   int32_t vectorCorrEnAsm[MAX_SIZE];
+   int16_t vectorCorrEnC[MAX_SIZE];
+   int16_t vectorCorrEnAsm[MAX_SIZE];
 
    //Inicializamos los vectores
    for (i = 0; i < MAX_SIZE; i++) {
-      vectorX[i] = 60 * sin(i);
-      vectorY[i] = 60 * sin(i+6);
+      vectorX[i] = 6 * sin(i);
+      vectorY[i] = 6 * sin(i+6);
    }
 
    initHardware();

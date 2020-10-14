@@ -56,10 +56,10 @@
 #define longitud    r3
 #define l           r4
 #define i           r5
-#define acumulador  r6
-#define valorX      r7
-#define valorY      r8
-#define j           r9
+#define j           r6
+#define acumulador  r7
+#define valorX      r8
+#define valorY      r9
 #define aux         r10
 
     /**
@@ -94,7 +94,7 @@ loop_n:
     cmp     i, longitud
     bne     loop_n
 
-    str     acumulador, [vectorCorr, l, LSL 2]
+    strh    acumulador, [vectorCorr, l, LSL 1]
 
     add     l, 1
     cmp     l, longitud

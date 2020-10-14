@@ -33,10 +33,10 @@
 
 #include <stdint.h>
 
-void corrInC(int16_t *vectorX, int16_t *vectorY, int32_t *vectorCorr,
+void corrInC(int16_t *vectorX, int16_t *vectorY, int16_t *vectorCorr,
       uint32_t longitud) {
    uint32_t i, j, l;
-   int32_t acumulador;
+   int16_t acumulador;
 
    for (l = 0; l < longitud; l++) {
 
