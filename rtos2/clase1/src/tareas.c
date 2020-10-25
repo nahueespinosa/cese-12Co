@@ -41,7 +41,7 @@ static TickType_t tec_start[tecs_count];
 /*=====[Implementation of public functions]==================================*/
 
 /**
- * @brief   Inicialización de tareas
+ * @brief   InicializaciÃ³n de tareas
  */
 void tareasInit( void ) {
    BaseType_t res;
@@ -69,8 +69,8 @@ void tareasInit( void ) {
 /**
  * @brief   Tarea A
  *
- * Enciende periódicamente un LED. Cada vez que el LED enciende, se
- * envía un mensaje "LED ON" a la "cola_1".
+ * Enciende periÃ³dicamente un LED. Cada vez que el LED enciende, se
+ * envÃ­a un mensaje "LED ON" a la "cola_1".
  */
 void tarea_A( void* pvParameters ) {
    char *mensaje = NULL;
@@ -98,11 +98,11 @@ void tarea_A( void* pvParameters ) {
  * @brief   Tarea B
  *
  * Lee con antirrebote el estado de i teclas. Mide el tiempo
- * de pulsación a través de las funciones "tec_pressed_callback"
+ * de pulsaciÃ³n a travÃ©s de las funciones "tec_pressed_callback"
  * y "tec_released_callback".
  *
- * Al medirse el tiempo de pulsación, envía el mensaje "TECx Tyyyy"
- * a la "cola_1" donde x es el índice e yyyy la cantidad de ms
+ * Al medirse el tiempo de pulsaciÃ³n, envÃ­a el mensaje "TECx Tyyyy"
+ * a la "cola_1" donde x es el Ã­ndice e yyyy la cantidad de ms
  * que fue pulsada.
  */
 void tarea_B( void* pvParameters ) {
@@ -122,7 +122,7 @@ void tarea_B( void* pvParameters ) {
 /**
  * @brief   Tarea C
  *
- * Obtiene de "cola_1" mensajes de texto y los envía por la
+ * Obtiene de "cola_1" mensajes de texto y los envÃ­a por la
  * UART_USB.
  */
 void tarea_C( void* pvParameters ) {
@@ -150,7 +150,7 @@ void tarea_C( void* pvParameters ) {
  */
 static void tec_pressed_callback( void *tec ) {
 
-   // Busco el índice de la tecla que se presionó
+   // Busco el Ã­ndice de la tecla que se presionÃ³
    for( uint32_t i = 0 ; i < tecs_count ; i++ ) {
       if( &tecs[i] == (debounceButton_t*) tec ) {
          tec_start[i] = xTaskGetTickCount();
@@ -167,12 +167,12 @@ static void tec_released_callback( void *tec ) {
    char *mensaje = NULL;
    TickType_t measurement;
 
-   // Busco el índice de la tecla que se liberó
+   // Busco el Ã­ndice de la tecla que se liberÃ³
    for( uint32_t i = 0 ; i < tecs_count ; i++ ) {
       if( &tecs[i] == (debounceButton_t*) tec ) {
          measurement = xTaskGetTickCount() - tec_start[i];
 
-         // Si la medición supera 4 dígitos se satura a 9999
+         // Si la mediciÃ³n supera 4 dÃ­gitos se satura a 9999
          if( measurement >= 10000 ) measurement = 9999;
 
          mensaje = pvPortMalloc( sizeof(TEC_MSG) );
