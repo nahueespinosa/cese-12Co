@@ -19,16 +19,14 @@ extern "C" {
 
 /*==================[typedef]================================================*/
 
-typedef enum
-{
+typedef enum {
     DEBOUNCE_BUTTON_UP,
     DEBOUNCE_BUTTON_DOWN,
     DEBOUNCE_BUTTON_FALLING,
     DEBOUNCE_BUTTON_RISING
 } debounceButtonState_t;
 
-typedef struct
-{
+typedef struct {
    gpioMap_t gpio;
    debounceButtonState_t state;
    tick_t refreshTime;
@@ -43,7 +41,7 @@ typedef struct
 
 /*=====[Prototypes (declarations) of public functions]=======================*/
 
-void debounceButtonInit  (
+void debounceButtonInit(
       debounceButton_t* button,
       gpioMap_t gpio,
       tick_t refreshTime,
