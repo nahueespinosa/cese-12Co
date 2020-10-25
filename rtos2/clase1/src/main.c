@@ -1,53 +1,61 @@
 /*=============================================================================
- * Copyright (c) 2020, Martin N. Menendez <menendezmartin81@gmail.com>
- * All rights reserved.
- * License: Free
- * Date: 2020/09/03
- * Version: v1.1
+ * Author: Nahuel Espinosa <nahue.espinosa@gmail.com>
+ * Date: 2020/09/19
  *===========================================================================*/
 
-/*==================[inclusiones]============================================*/
-#include "main.h"
-/*==================[definiciones y macros]==================================*/
+/*=====[Inclusions of function dependencies]=================================*/
 
-/*==================[definiciones de datos internos]=========================*/
+#include "sapi.h"
+#include "FreeRTOS.h"
+#include "task.h"
 
-/*==================[definiciones de datos externos]=========================*/
-DEBUG_PRINT_ENABLE;
-/*==================[declaraciones de funciones internas]====================*/
+/*=====[Definition macros of private constants]==============================*/
 
-/*==================[declaraciones de funciones externas]====================*/
+/*=====[Definitions of private global variables]=============================*/
 
-/*==================[funcion principal]======================================*/
+/*=====[Prototypes (declarations) of private functions]======================*/
+void tarea_A(void* pvParameters);
 
-// FUNCION PRINCIPAL, PUNTO DE ENTRADA AL PROGRAMA LUEGO DE ENCENDIDO O RESET.
+/*=====[Implementation of public functions]==================================*/
+
 int main( void )
 {
-    // ---------- CONFIGURACIONES ------------------------------
+   BaseType_t res;
 
-	boardConfig();								// Inicializar y configurar la plataforma
+   boardConfig();
 
-	debugPrintConfigUart( UART, BAUD_RATE );	// UART for debug messages
-	printf( MSG_WELCOME );
+   res = xTaskCreate(tarea_A,          // Funcion de la tarea a ejecutar
+         (const char *) "Tarea A",     // Nombre de la tarea como String amigable para el usuario
+         configMINIMAL_STACK_SIZE * 2,    // Cantidad de stack de la tarea
+         0,                               // Parametros de tarea
+         tskIDLE_PRIORITY + 1,            // Prioridad de la tarea
+         0                                // Puntero a la tarea creada en el sistema
+         );
 
-	tecla_led_init();							// Inicializar estructura de datos
+   configASSERT(res == pdPASS);
 
-	 // Crear y validar tarea en freeRTOS
-	tareas_crear(tarea_tecla,MSG_TECLA);		 // Tareas de teclas
-	tareas_crear(tarea_led,MSG_LED);			 // Tareas de leds
+   vTaskStartScheduler();
 
-    // Iniciar scheduler
-    vTaskStartScheduler();				// Enciende tick | Crea idle y pone en ready | Evalua las tareas creadas | Prioridad mas alta pasa a running
+   // ---------- REPETIR POR SIEMPRE --------------------------
+   while( TRUE )
+   {
+      // Si cae en este while 1 significa que no pudo iniciar el scheduler
+   }
 
-    // ---------- REPETIR POR SIEMPRE --------------------------
-    while( TRUE )
-    {
-        // Si cae en este while 1 significa que no pudo iniciar el scheduler
-    }
-
-    // NO DEBE LLEGAR NUNCA AQUI, debido a que a este programa se ejecuta
-    // directamenteno sobre un microcontroladore y no es llamado por ningun
-    // Sistema Operativo, como en el caso de un programa para PC.
-    return TRUE;
+   // NO DEBE LLEGAR NUNCA AQUI, debido a que a este programa se ejecuta
+   // directamenteno sobre un microcontroladore y no es llamado por ningun
+   // Sistema Operativo, como en el caso de un programa para PC.
+   return TRUE;
 }
-/*==================[fin del archivo]========================================*/
+
+/*=====[Implementation of private functions]=================================*/
+void tarea_A(void* pvParameters) {
+
+
+   while ( TRUE) {
+      gpioToggle(LEDB);
+
+   }
+}
+
+
