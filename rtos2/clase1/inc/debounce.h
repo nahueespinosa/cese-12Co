@@ -28,26 +28,19 @@ typedef enum {
 
 typedef struct {
    gpioMap_t gpio;
-   debounceButtonState_t state;
    tick_t refreshTime;
-
-   uint8_t contFalling;
-   uint8_t contRising;
 
    callBackFuncPtr_t pressedCallback;
    callBackFuncPtr_t releasedCallback;
 
+   debounceButtonState_t state;
+
+   uint8_t contFalling;
+   uint8_t contRising;
+
 } debounceButton_t;
 
 /*=====[Prototypes (declarations) of public functions]=======================*/
-
-void debounceButtonInit(
-      debounceButton_t* button,
-      gpioMap_t gpio,
-      tick_t refreshTime,
-      callBackFuncPtr_t pressedCallback,
-      callBackFuncPtr_t releasedCallback
-);
 
 void debounceButtonUpdate( debounceButton_t* button );
 

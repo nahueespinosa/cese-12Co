@@ -15,22 +15,6 @@
 
 /*=====[Implementation of public functions]==================================*/
 
-void debounceButtonInit( debounceButton_t* button, gpioMap_t gpio,
-      tick_t refreshTime,
-      callBackFuncPtr_t pressedCallback,
-      callBackFuncPtr_t releasedCallback ) {
-
-   button->gpio = gpio;
-   button->refreshTime = refreshTime;
-
-   button->pressedCallback = pressedCallback;
-   button->releasedCallback = releasedCallback;
-
-   button->contFalling = 0;
-   button->contRising = 0;
-   button->state = DEBOUNCE_BUTTON_UP;
-}
-
 void debounceButtonUpdate( debounceButton_t* button ) {
    switch( button->state ) {
       case DEBOUNCE_BUTTON_UP:

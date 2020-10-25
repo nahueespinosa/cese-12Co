@@ -16,15 +16,25 @@
 #include "task.h"
 #include "queue.h"
 
-/*=====[Definitions of private global variables]=============================*/
+/*=====[Definition macros of private constants]==============================*/
 
-static QueueHandle_t cola_1;
-static TickType_t tec1_start, tec2_start;
+#define tecs_count   sizeof(tecs)/sizeof(tecs[0])
 
 /*=====[Prototypes (declarations) of private functions]======================*/
 
 static void tec_pressed_callback( void *param );
 static void tec_released_callback( void *param );
+
+/*=====[Definitions of private global variables]=============================*/
+
+static QueueHandle_t cola_1;
+
+static debounceButton_t tecs[] = {
+   { TEC1, TEC_PERIODICITY_MS, tec_pressed_callback, tec_released_callback, DEBOUNCE_BUTTON_UP, 0, 0 },
+   { TEC2, TEC_PERIODICITY_MS, tec_pressed_callback, tec_released_callback, DEBOUNCE_BUTTON_UP, 0, 0 },
+};
+
+static TickType_t tec_start[tecs_count];
 
 /*=====[Implementation of public functions]==================================*/
 
@@ -85,7 +95,7 @@ void tarea_A( void* pvParameters ) {
 /**
  * @brief Tarea B
  *
- * Lee con antirrebote el estado de 2 teclas. Mide el tiempo
+ * Lee con antirrebote el estado de i teclas. Mide el tiempo
  * de pulsación a través de las funciones "tec_pressed_callback"
  * y "tec_released_callback".
  *
@@ -94,22 +104,16 @@ void tarea_A( void* pvParameters ) {
  * que fue pulsada.
  */
 void tarea_B( void* pvParameters ) {
-   debounceButton_t tec_1;
-   debounceButton_t tec_2;
-
    char *mensaje = NULL;
 
    TickType_t xLastWakeTime = xTaskGetTickCount();
 
-   debounceButtonInit( &tec_1, TEC1, TEC_PERIODICITY_MS,
-      tec_pressed_callback, tec_released_callback );
-
-   debounceButtonInit( &tec_2, TEC2, TEC_PERIODICITY_MS,
-      tec_pressed_callback, tec_released_callback );
-
    while ( TRUE) {
-      debounceButtonUpdate( &tec_1 );
-      debounceButtonUpdate( &tec_2 );
+
+      // Actualizo el estado de cada tecla
+      for( uint32_t i = 0 ; i < tecs_count ; i++ ) {
+         debounceButtonUpdate( &tecs[i] );
+      }
 
       vTaskDelayUntil( &xLastWakeTime, TEC_PERIODICITY );
    }
@@ -142,34 +146,28 @@ void tarea_C( void* pvParameters ) {
 /*=====[Implementation of private functions]=================================*/
 
 static void tec_pressed_callback( void *param ) {
-   debounceButton_t *tec = (debounceButton_t*) param;
 
-   switch( tec->gpio ) {
-      case TEC1:
-         tec1_start = xTaskGetTickCount();
+   // Busco qué tecla se presionó
+   for( uint32_t i = 0 ; i < tecs_count ; i++ ) {
+      if( &tecs[i] == (debounceButton_t*) param ) {
+         tec_start[i] = xTaskGetTickCount();
          break;
-      case TEC2:
-         tec2_start = xTaskGetTickCount();
-         break;
+      }
    }
 }
 
 static void tec_released_callback( void *param ) {
-   debounceButton_t *tec = (debounceButton_t*) param;
    TickType_t measurement;
-   uint32_t index;
+   uint32_t i;
 
    char *mensaje = NULL;
 
-   switch( tec->gpio ) {
-      case TEC1:
-         measurement = xTaskGetTickCount() - tec1_start;
-         index = 1;
+   // Busco que tecla se liberó
+   for( i = 0 ; i < tecs_count ; i++ ) {
+      if( &tecs[i] == (debounceButton_t*) param ) {
+         measurement = xTaskGetTickCount() - tec_start[i];
          break;
-      case TEC2:
-         measurement = xTaskGetTickCount() - tec2_start;
-         index = 2;
-         break;
+      }
    }
 
    // Si la medición supera 4 dígitos se satura a 9999
@@ -178,7 +176,7 @@ static void tec_released_callback( void *param ) {
    mensaje = pvPortMalloc( sizeof(TEC_MSG) );
 
    if( mensaje != NULL ) {
-      sprintf( mensaje, TEC_MSG_FORMAT, index, measurement );
+      sprintf( mensaje, TEC_MSG_FORMAT, i+1, measurement );
       xQueueSend( cola_1, &mensaje, portMAX_DELAY );
    }
 }
