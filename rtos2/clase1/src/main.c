@@ -6,10 +6,10 @@
 /*=====[Inclusions of function dependencies]=================================*/
 
 #include "sapi.h"
+#include "tareas.h"
+
 #include "FreeRTOS.h"
 #include "task.h"
-
-#include "tasks.h"
 
 /*=====[Definition macros of private constants]==============================*/
 

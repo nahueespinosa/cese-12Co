@@ -8,7 +8,6 @@
 
 /*=====[Inclusions of function dependencies]=================================*/
 
-#include "FreeRTOS.h"
 #include "sapi.h"
 
 /*=====[C++ - begin]=========================================================*/
