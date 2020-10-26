@@ -30,7 +30,7 @@
 #define  TEC_PERIODICITY      pdMS_TO_TICKS(TEC_PERIODICITY_MS)
 
 #define  TEC_MSG              "TECx Tyyyy\n"
-#define  TEC_MSG_FORMAT       "TEC%d T%04d\n"
+#define  TEC_MSG_FORMAT       "TEC%c T%04d\n"
 
 #define  TEC_COUNT            sizeof(tecs)/sizeof(tecs[0])
 
@@ -51,18 +51,24 @@ static void tarea_D( void* pvParameters );
 static void tec_pressed_callback( void * );
 static void tec_released_callback( void * );
 
+/*==================[typedef]================================================*/
+
+typedef struct {
+   debounceButton_t  super;
+   TickType_t        start_time;
+   char              ascii_number;
+} appButton_t;
+
 /*=====[Definitions of private global variables]=============================*/
 
 static Messenger obj1, obj2;
 
-static debounceButton_t tecs[] = {
+static appButton_t tecs[] = {
    { TEC1, TEC_PERIODICITY_MS, tec_pressed_callback, tec_released_callback,
-         DEBOUNCE_BUTTON_UP, 0, 0 },
+         DEBOUNCE_BUTTON_UP, 0, 0, 0, '1' },
    { TEC2, TEC_PERIODICITY_MS, tec_pressed_callback, tec_released_callback,
-         DEBOUNCE_BUTTON_UP, 0, 0 },
+         DEBOUNCE_BUTTON_UP, 0, 0, 0, '2' },
 };
-
-static TickType_t tec_start[TEC_COUNT];
 
 /*=====[Implementation of public functions]==================================*/
 
@@ -139,7 +145,7 @@ static void tarea_B( void* pvParameters ) {
 
       // Actualizo el estado de cada tecla por polling
       for( uint32_t i = 0 ; i < TEC_COUNT ; i++ ) {
-         debounceButtonUpdate( &tecs[i] );
+         debounceButtonUpdate( (debounceButton_t*)&tecs[i] );
       }
 
       vTaskDelayUntil( &xLastWakeTime, TEC_PERIODICITY );
@@ -187,39 +193,34 @@ static void tarea_D( void* pvParameters ) {
 
 /**
  * @brief   Callback para una tecla presionada
+ *
+ * Empieza a medir el tiempo.
+ *
  * @param   tec   Puntero a la tecla presionada
  */
 static void tec_pressed_callback( void *tec ) {
-
-   // Busco el índice de la tecla que se presionó
-   for( uint32_t i = 0 ; i < TEC_COUNT ; i++ ) {
-      if( &tecs[i] == (debounceButton_t*) tec ) {
-         tec_start[i] = xTaskGetTickCount();
-         break;
-      }
-   }
+   appButton_t *currentTec = (appButton_t *) tec;
+   currentTec->start_time = xTaskGetTickCount();
 }
 
 /**
  * @brief   Callback para una tecla liberada
+ *
+ * Toma la medición de tiempo presionada y envía el dato
+ * a la cola.
+ *
  * @param   tec   Puntero a la tecla liberada
  */
 static void tec_released_callback( void *tec ) {
    char mensaje[] = TEC_MSG;
    TickType_t measurement;
+   appButton_t *currentTec = (appButton_t *) tec;
 
-   // Busco el índice de la tecla que se liberó
-   for( uint32_t i = 0 ; i < TEC_COUNT ; i++ ) {
-      if( &tecs[i] == (debounceButton_t*) tec ) {
-         measurement = xTaskGetTickCount() - tec_start[i];
+   measurement = xTaskGetTickCount() - currentTec->start_time;
 
-         // Si la medición supera 4 dígitos se satura a 9999
-         if( measurement >= 10000 ) measurement = 9999;
+   // Si la medición supera 4 dígitos se satura a 9999
+   if( measurement >= 10000 ) measurement = 9999;
 
-         sprintf( mensaje, TEC_MSG_FORMAT, i+1, measurement );
-         Messenger_post( &obj1, (void*) mensaje, sizeof(mensaje) );
-
-         break;
-      }
-   }
+   sprintf( mensaje, TEC_MSG_FORMAT, currentTec->ascii_number, measurement );
+   Messenger_post( &obj1, (void*) mensaje, sizeof(mensaje) );
 }
