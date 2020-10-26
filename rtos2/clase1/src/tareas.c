@@ -68,7 +68,7 @@ static TickType_t tec_start[TEC_COUNT];
 void tareasInit( void ) {
    BaseType_t res;
 
-   cola_1 = xQueueCreate( QUEUE_SIZE, sizeof(char) );
+   cola_1 = xQueueCreate( QUEUE_SIZE, sizeof(void *) );
 
    configASSERT( cola_1 != NULL );
 
