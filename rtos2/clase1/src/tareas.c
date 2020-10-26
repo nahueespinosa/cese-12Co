@@ -5,8 +5,8 @@
 
 /*=====[Inclusions of function dependencies]=================================*/
 
-#include "tareas.h"
 #include <string.h>
+#include "tareas.h"
 
 #include "sapi.h"
 
@@ -18,9 +18,31 @@
 
 /*=====[Definition macros of private constants]==============================*/
 
-#define tecs_count   sizeof(tecs)/sizeof(tecs[0])
+#define  LED                  LEDB
+
+#define  LED_PERIODICITY_MS   1000
+#define  LED_PERIODICITY      pdMS_TO_TICKS(LED_PERIODICITY_MS)
+
+#define  LED_MSG              "LED ON\n"
+
+#define  TEC_PERIODICITY_MS   5
+#define  TEC_PERIODICITY      pdMS_TO_TICKS(TEC_PERIODICITY_MS)
+
+#define  TEC_MSG              "TECx Tyyyy\n"
+#define  TEC_MSG_FORMAT       "TEC%d T%04d\n"
+
+#define  TEC_COUNT            sizeof(tecs)/sizeof(tecs[0])
+
+#define  UART                 UART_USB
+#define  UART_BAUDRATE        115200
+
+#define  QUEUE_SIZE           20
 
 /*=====[Prototypes (declarations) of private functions]======================*/
+
+static void tarea_A( void* pvParameters );
+static void tarea_B( void* pvParameters );
+static void tarea_C( void* pvParameters );
 
 static void tec_pressed_callback( void * );
 static void tec_released_callback( void * );
@@ -36,7 +58,7 @@ static debounceButton_t tecs[] = {
          DEBOUNCE_BUTTON_UP, 0, 0 },
 };
 
-static TickType_t tec_start[tecs_count];
+static TickType_t tec_start[TEC_COUNT];
 
 /*=====[Implementation of public functions]==================================*/
 
@@ -66,21 +88,23 @@ void tareasInit( void ) {
    configASSERT( res == pdPASS );
 }
 
+/*=====[Implementation of private functions]=================================*/
+
 /**
  * @brief   Tarea A
  *
  * Enciende periódicamente un LED. Cada vez que el LED enciende, se
  * envía un mensaje "LED ON" a la "cola_1".
  */
-void tarea_A( void* pvParameters ) {
+static void tarea_A( void* pvParameters ) {
    char *mensaje = NULL;
 
    TickType_t xLastWakeTime = xTaskGetTickCount();
 
    while ( TRUE ) {
-      gpioToggle(LEDB);
+      gpioToggle(LED);
 
-      if( gpioRead(LEDB) == ON ) {
+      if( gpioRead(LED) == ON ) {
          mensaje = pvPortMalloc( sizeof(LED_MSG) );
 
          if( mensaje != NULL ) {
@@ -97,7 +121,7 @@ void tarea_A( void* pvParameters ) {
 /**
  * @brief   Tarea B
  *
- * Lee con antirrebote el estado de i teclas. Mide el tiempo
+ * Lee con antirrebote el estado de todas las teclas. Mide el tiempo
  * de pulsación a través de las funciones "tec_pressed_callback"
  * y "tec_released_callback".
  *
@@ -105,13 +129,13 @@ void tarea_A( void* pvParameters ) {
  * a la "cola_1" donde x es el índice e yyyy la cantidad de ms
  * que fue pulsada.
  */
-void tarea_B( void* pvParameters ) {
+static void tarea_B( void* pvParameters ) {
    TickType_t xLastWakeTime = xTaskGetTickCount();
 
    while ( TRUE ) {
 
       // Actualizo el estado de cada tecla por polling
-      for( uint32_t i = 0 ; i < tecs_count ; i++ ) {
+      for( uint32_t i = 0 ; i < TEC_COUNT ; i++ ) {
          debounceButtonUpdate( &tecs[i] );
       }
 
@@ -125,24 +149,22 @@ void tarea_B( void* pvParameters ) {
  * Obtiene de "cola_1" mensajes de texto y los envía por la
  * UART_USB.
  */
-void tarea_C( void* pvParameters ) {
+static void tarea_C( void* pvParameters ) {
    char *mensaje = NULL;
 
-   uartConfig( UART_USB, UART_BAUDRATE );
+   uartConfig( UART, UART_BAUDRATE );
 
    while ( TRUE ) {
 
       xQueueReceive( cola_1, &mensaje, portMAX_DELAY );
 
       if( mensaje != NULL ) {
-         uartWriteString( UART_USB, mensaje );
+         uartWriteString( UART, mensaje );
          vPortFree( mensaje );
          mensaje = NULL;
       }
    }
 }
-
-/*=====[Implementation of private functions]=================================*/
 
 /**
  * @brief   Callback para una tecla presionada
@@ -151,7 +173,7 @@ void tarea_C( void* pvParameters ) {
 static void tec_pressed_callback( void *tec ) {
 
    // Busco el índice de la tecla que se presionó
-   for( uint32_t i = 0 ; i < tecs_count ; i++ ) {
+   for( uint32_t i = 0 ; i < TEC_COUNT ; i++ ) {
       if( &tecs[i] == (debounceButton_t*) tec ) {
          tec_start[i] = xTaskGetTickCount();
          break;
@@ -168,7 +190,7 @@ static void tec_released_callback( void *tec ) {
    TickType_t measurement;
 
    // Busco el índice de la tecla que se liberó
-   for( uint32_t i = 0 ; i < tecs_count ; i++ ) {
+   for( uint32_t i = 0 ; i < TEC_COUNT ; i++ ) {
       if( &tecs[i] == (debounceButton_t*) tec ) {
          measurement = xTaskGetTickCount() - tec_start[i];
 
