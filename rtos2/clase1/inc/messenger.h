@@ -30,7 +30,7 @@ typedef struct {
 
 void Messenger_ctor( Messenger * const me, uint32_t queue_size );
 bool_t Messenger_post( Messenger * const me, void * buffer, uint32_t size );
-bool_t Messenger_get( Messenger * const me, void * buffer, uint32_t size );
+bool_t Messenger_get( Messenger * const me, void * buffer, uint32_t * size );
 
 /*=====[C++ - end]===========================================================*/
 

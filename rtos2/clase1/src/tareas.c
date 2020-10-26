@@ -111,7 +111,7 @@ void tareasInit( void ) {
  * envía un mensaje "LED ON" a la "cola_1".
  */
 static void tarea_A( void* pvParameters ) {
-   char mensaje[] = LED_MSG;
+   char message[] = LED_MSG;
 
    TickType_t xLastWakeTime = xTaskGetTickCount();
 
@@ -119,7 +119,7 @@ static void tarea_A( void* pvParameters ) {
       gpioToggle(LED);
 
       if( gpioRead(LED) == ON ) {
-         Messenger_post( &obj1, (void*) mensaje, sizeof(mensaje) );
+         Messenger_post( &obj1, (void*) message, sizeof(message) );
       }
 
       vTaskDelayUntil( &xLastWakeTime, LED_PERIODICITY / 2 );
@@ -159,14 +159,15 @@ static void tarea_B( void* pvParameters ) {
  * UART_USB.
  */
 static void tarea_C( void* pvParameters ) {
-   char mensaje[UART_MSG_MAX_SIZE];
+   char message[UART_MSG_MAX_SIZE];
+   uint32_t size;
 
    uartConfig( UART, UART_BAUDRATE );
 
    while ( TRUE ) {
-      if( Messenger_get( &obj1, (void*) mensaje, UART_MSG_MAX_SIZE ) ) {
-         Messenger_post( &obj2, (void*) mensaje, UART_MSG_MAX_SIZE );
-         uartWriteString( UART, mensaje );
+      if( Messenger_get( &obj1, (void*) message, &size ) ) {
+         Messenger_post( &obj2, (void*) message, size );
+         uartWriteString( UART, message );
       }
    }
 }
@@ -178,12 +179,13 @@ static void tarea_C( void* pvParameters ) {
  * Si recibe algo blinkea el LED3.
  */
 static void tarea_D( void* pvParameters ) {
-   char mensaje[UART_MSG_MAX_SIZE];
+   char message[UART_MSG_MAX_SIZE];
+   uint32_t size;
 
    gpioWrite(LED3, OFF);
 
    while ( TRUE ) {
-      if( Messenger_get( &obj2, (void*) mensaje, UART_MSG_MAX_SIZE ) ) {
+      if( Messenger_get( &obj2, (void*) message, &size ) ) {
          gpioWrite(LED3, ON);
          vTaskDelay( pdMS_TO_TICKS(50) );
          gpioWrite(LED3, OFF);
@@ -212,7 +214,7 @@ static void tec_pressed_callback( void *tec ) {
  * @param   tec   Puntero a la tecla liberada
  */
 static void tec_released_callback( void *tec ) {
-   char mensaje[] = TEC_MSG;
+   char message[] = TEC_MSG;
    TickType_t measurement;
    appButton_t *currentTec = (appButton_t *) tec;
 
@@ -221,6 +223,6 @@ static void tec_released_callback( void *tec ) {
    // Si la medición supera 4 dígitos se satura a 9999
    if( measurement >= 10000 ) measurement = 9999;
 
-   sprintf( mensaje, TEC_MSG_FORMAT, currentTec->ascii_number, measurement );
-   Messenger_post( &obj1, (void*) mensaje, sizeof(mensaje) );
+   sprintf( message, TEC_MSG_FORMAT, currentTec->ascii_number, measurement );
+   Messenger_post( &obj1, (void*) message, sizeof(message) );
 }

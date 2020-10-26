@@ -8,15 +8,23 @@
 #include "messenger.h"
 #include <string.h>
 
+/*==================[typedef]================================================*/
+
+typedef struct {
+   void * ptr;
+   uint32_t size;
+} Message_t;
+
 /*=====[Implementation of public functions]==================================*/
 
 /**
  * @brief   Constructor del objeto
- * @param   me          Referencia al objeto
- * @param   queue_size  Cantidad máxima de mensajes
+ *
+ * @param[in]  me          Referencia al objeto
+ * @param[in]  queue_size  Cantidad máxima de mensajes
  */
 void Messenger_ctor( Messenger * const me, uint32_t queue_size ) {
-   me->queue = xQueueCreate( queue_size, sizeof(void *) );
+   me->queue = xQueueCreate( queue_size, sizeof(Message_t) );
 
    configASSERT( me->queue != NULL );
 }
@@ -27,21 +35,22 @@ void Messenger_ctor( Messenger * const me, uint32_t queue_size ) {
  * Reserva memoria dinámica para el mensaje y envía el puntero a través
  * de una cola.
  *
- * @param   me          Referencia del objeto
- * @param   buffer      Buffer con el mensaje a transmitir
- * @param   size        Tamaño del mensaje en bytes
+ * @param[in]  me          Referencia del objeto
+ * @param[in]  buffer      Buffer con el mensaje a transmitir
+ * @param[in]  size        Tamaño del mensaje en bytes
  *
- * @return  TRUE        Si se pudo enviar
- *          FALSE       Si no se pudo enviar
+ * @return     TRUE        Si pudo alocar la memoria dinámica
+ *             FALSE       Si no pudo alocar la memoria dinámica
  */
 bool_t Messenger_post( Messenger * const me, void * buffer, uint32_t size ) {
-   char *message;
-   message = pvPortMalloc( size );
+   Message_t msg;
 
-   memcpy( message, buffer, size );
+   msg.ptr = pvPortMalloc( size );
 
-   if( buffer != NULL ) {
-      xQueueSend( me->queue, &message, portMAX_DELAY );
+   if( msg.ptr != NULL ) {
+      msg.size = size;
+      memcpy( msg.ptr, buffer, size );
+      xQueueSend( me->queue, &msg, portMAX_DELAY );
       return TRUE;
    } else {
       return FALSE;
@@ -51,25 +60,26 @@ bool_t Messenger_post( Messenger * const me, void * buffer, uint32_t size ) {
 /**
  * @brief   Obtener mensaje
  *
- * Espera de forma bloqueante la llegada de un nuevo mensaje.
+ * Espera de forma BLOQUEANTE la llegada de un nuevo mensaje.
  * Libera la memoria reservada y devuelve el resultado en un buffer de
  * recepción.
  *
- * @param   me          Referencia al objeto
- * @param   buffer      Buffer de recepción
- * @param   size        Tamaño máximo del mensaje en bytes
+ * @param[in]  me          Referencia al objeto
+ * @param[out] buffer      Buffer de recepción
+ * @param[out] size        Tamaño del mensaje recibido en bytes
  *
- * @return  TRUE        Si recibió un puntero no nulo.
- *          FALSE       Si recibió un puntero nulo.
+ * @return     TRUE        Si recibió un puntero no nulo.
+ *             FALSE       Si recibió un puntero nulo.
  */
-bool_t Messenger_get( Messenger * const me, void * buffer, uint32_t size ) {
-   char *message;
-   xQueueReceive( me->queue, &message, portMAX_DELAY );
+bool_t Messenger_get( Messenger * const me, void * buffer, uint32_t * size ) {
+   Message_t msg;
+   xQueueReceive( me->queue, &msg, portMAX_DELAY );
 
-   if( buffer != NULL ) {
-      memcpy( buffer, message, size );
-      vPortFree( message );
-      message = NULL;
+   if( msg.ptr != NULL ) {
+      memcpy( buffer, msg.ptr, msg.size );
+      *size = msg.size;
+      vPortFree( msg.ptr );
+      msg.ptr = NULL;
       return TRUE;
    } else {
       return FALSE;
