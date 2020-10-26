@@ -11,6 +11,7 @@
 #include "sapi.h"
 
 #include "debounce.h"
+#include "messenger.h"
 
 #include "FreeRTOS.h"
 #include "task.h"
@@ -36,6 +37,8 @@
 #define  UART                 UART_USB
 #define  UART_BAUDRATE        115200
 
+#define  UART_MSG_MAX_SIZE    15
+
 #define  QUEUE_SIZE           20
 
 /*=====[Prototypes (declarations) of private functions]======================*/
@@ -43,13 +46,14 @@
 static void tarea_A( void* pvParameters );
 static void tarea_B( void* pvParameters );
 static void tarea_C( void* pvParameters );
+static void tarea_D( void* pvParameters );
 
 static void tec_pressed_callback( void * );
 static void tec_released_callback( void * );
 
 /*=====[Definitions of private global variables]=============================*/
 
-static QueueHandle_t cola_1;
+static Messenger obj1, obj2;
 
 static debounceButton_t tecs[] = {
    { TEC1, TEC_PERIODICITY_MS, tec_pressed_callback, tec_released_callback,
@@ -68,22 +72,26 @@ static TickType_t tec_start[TEC_COUNT];
 void tareasInit( void ) {
    BaseType_t res;
 
-   cola_1 = xQueueCreate( QUEUE_SIZE, sizeof(void *) );
-
-   configASSERT( cola_1 != NULL );
+   Messenger_ctor( &obj1, QUEUE_SIZE );
+   Messenger_ctor( &obj2, QUEUE_SIZE );
 
    res = xTaskCreate( tarea_A, (const char *) "Tarea A",
-         configMINIMAL_STACK_SIZE * 2, 0, tskIDLE_PRIORITY + 1, 0 );
+         configMINIMAL_STACK_SIZE * 2, 0, tskIDLE_PRIORITY + 2, 0 );
 
    configASSERT( res == pdPASS );
 
    res = xTaskCreate( tarea_B, (const char *) "Tarea B",
-         configMINIMAL_STACK_SIZE * 2, 0, tskIDLE_PRIORITY + 1, 0 );
+         configMINIMAL_STACK_SIZE * 2, 0, tskIDLE_PRIORITY + 2, 0 );
 
    configASSERT( res == pdPASS );
 
    res = xTaskCreate( tarea_C, (const char *) "Tarea C",
          configMINIMAL_STACK_SIZE * 2, 0, tskIDLE_PRIORITY + 1, 0 );
+
+   configASSERT( res == pdPASS );
+
+   res = xTaskCreate( tarea_D, (const char *) "Tarea D",
+            configMINIMAL_STACK_SIZE * 2, 0, tskIDLE_PRIORITY + 1, 0 );
 
    configASSERT( res == pdPASS );
 }
@@ -97,7 +105,7 @@ void tareasInit( void ) {
  * envía un mensaje "LED ON" a la "cola_1".
  */
 static void tarea_A( void* pvParameters ) {
-   char *mensaje = NULL;
+   char mensaje[] = LED_MSG;
 
    TickType_t xLastWakeTime = xTaskGetTickCount();
 
@@ -105,12 +113,7 @@ static void tarea_A( void* pvParameters ) {
       gpioToggle(LED);
 
       if( gpioRead(LED) == ON ) {
-         mensaje = pvPortMalloc( sizeof(LED_MSG) );
-
-         if( mensaje != NULL ) {
-            strcpy( mensaje, LED_MSG );
-            xQueueSend( cola_1, &mensaje, portMAX_DELAY );
-         }
+         Messenger_post( &obj1, (void*) mensaje, sizeof(mensaje) );
       }
 
       vTaskDelayUntil( &xLastWakeTime, LED_PERIODICITY / 2 );
@@ -150,18 +153,34 @@ static void tarea_B( void* pvParameters ) {
  * UART_USB.
  */
 static void tarea_C( void* pvParameters ) {
-   char *mensaje = NULL;
+   char mensaje[UART_MSG_MAX_SIZE];
 
    uartConfig( UART, UART_BAUDRATE );
 
    while ( TRUE ) {
-
-      xQueueReceive( cola_1, &mensaje, portMAX_DELAY );
-
-      if( mensaje != NULL ) {
+      if( Messenger_get( &obj1, (void*) mensaje, UART_MSG_MAX_SIZE ) ) {
+         Messenger_post( &obj2, (void*) mensaje, UART_MSG_MAX_SIZE );
          uartWriteString( UART, mensaje );
-         vPortFree( mensaje );
-         mensaje = NULL;
+      }
+   }
+}
+
+/**
+ * @brief   Tarea D
+ *
+ * Esta tarea consume las cadenas de texto de la Tarea C.
+ * Si recibe algo blinkea el LED3.
+ */
+static void tarea_D( void* pvParameters ) {
+   char mensaje[UART_MSG_MAX_SIZE];
+
+   gpioWrite(LED3, OFF);
+
+   while ( TRUE ) {
+      if( Messenger_get( &obj2, (void*) mensaje, UART_MSG_MAX_SIZE ) ) {
+         gpioWrite(LED3, ON);
+         vTaskDelay( pdMS_TO_TICKS(50) );
+         gpioWrite(LED3, OFF);
       }
    }
 }
@@ -186,7 +205,7 @@ static void tec_pressed_callback( void *tec ) {
  * @param   tec   Puntero a la tecla liberada
  */
 static void tec_released_callback( void *tec ) {
-   char *mensaje = NULL;
+   char mensaje[] = TEC_MSG;
    TickType_t measurement;
 
    // Busco el índice de la tecla que se liberó
@@ -197,12 +216,8 @@ static void tec_released_callback( void *tec ) {
          // Si la medición supera 4 dígitos se satura a 9999
          if( measurement >= 10000 ) measurement = 9999;
 
-         mensaje = pvPortMalloc( sizeof(TEC_MSG) );
-
-         if( mensaje != NULL ) {
-            sprintf( mensaje, TEC_MSG_FORMAT, i+1, measurement );
-            xQueueSend( cola_1, &mensaje, portMAX_DELAY );
-         }
+         sprintf( mensaje, TEC_MSG_FORMAT, i+1, measurement );
+         Messenger_post( &obj1, (void*) mensaje, sizeof(mensaje) );
 
          break;
       }
