@@ -6,8 +6,8 @@ Carpeta con ejercicios y entregables del curso de Sistemas Operativos de Propós
 
 1. Linux
 2. Procesos y Threads
-3. 
-4.  
+3. Signals y Pipes
+4. Named FIFOs, Sockets UDP
 5. 
 
 ## Docentes
