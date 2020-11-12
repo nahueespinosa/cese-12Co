@@ -7,6 +7,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <stdint.h>
+#include <signal.h>
 
 #define FIFO_NAME "myfifo"
 #define BUFFER_SIZE 300
@@ -14,13 +15,21 @@
 #define DATA_PREFIX "DATA:"
 #define PREFIX_SIZE 5
 
+#define SIGN_1_MSG  "SIGN:1"
+#define SIGN_2_MSG  "SIGN:2"
+
 #define TOTAL_SIZE  300
+
+int32_t fd;
+
+void sigusr_handler(int sig);
 
 int main(void)
 {
+    struct sigaction sa;
     char outputBuffer[TOTAL_SIZE];
 	uint32_t bytesWrote;
-	int32_t returnCode, fd;
+	int32_t returnCode;
 
     /* Write DATA: prefix in output buffer */
     strncpy(outputBuffer, DATA_PREFIX, PREFIX_SIZE);
@@ -39,6 +48,12 @@ int main(void)
         printf("Error opening named fifo file: %d\n", fd);
         exit(1);
     }
+
+    sa.sa_handler = sigusr_handler;
+    sa.sa_flags = 0;
+    sigemptyset(&sa.sa_mask);
+    sigaction(SIGUSR1, &sa, NULL);
+    sigaction(SIGUSR2, &sa, NULL);
     
     /* open syscalls returned without error -> other process attached to named fifo */
 	printf("got a reader--type some stuff\n");
@@ -47,17 +62,32 @@ int main(void)
 	while (1)
 	{
         /* Get some text from console */
-		fgets(outputBuffer + PREFIX_SIZE, BUFFER_SIZE, stdin);
-        
-        /* Write buffer to named fifo. Strlen - 1 to avoid sending \n char */
-		if ((bytesWrote = write(fd, outputBuffer, strlen(outputBuffer)-1)) == -1)
+		if (fgets(outputBuffer + PREFIX_SIZE, BUFFER_SIZE, stdin) != NULL)
         {
-			perror("write");
-        }
-        else
-        {
-			printf("writer: wrote %d bytes\n", bytesWrote);
+            /* Write buffer to named fifo. Strlen - 1 to avoid sending \n char */
+            if ((bytesWrote = write(fd, outputBuffer, strlen(outputBuffer)-1)) == -1)
+            {
+                perror("write");
+            }
+            else
+            {
+                printf("writer: wrote %d bytes\n", bytesWrote);
+            }
         }
 	}
 	return 0;
+}
+
+void sigusr_handler(int sig)
+{
+    if (sig == SIGUSR1)
+    {
+        write(fd, SIGN_1_MSG, sizeof(SIGN_1_MSG));
+    }
+
+    if (sig == SIGUSR2)
+    {
+        write(fd, SIGN_2_MSG, sizeof(SIGN_2_MSG));
+    }
+    
 }
