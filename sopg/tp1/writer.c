@@ -11,12 +11,19 @@
 #define FIFO_NAME "myfifo"
 #define BUFFER_SIZE 300
 
+#define DATA_PREFIX "DATA:"
+#define PREFIX_SIZE 5
+
+#define TOTAL_SIZE  300
+
 int main(void)
 {
-   
-    char outputBuffer[BUFFER_SIZE];
+    char outputBuffer[TOTAL_SIZE];
 	uint32_t bytesWrote;
 	int32_t returnCode, fd;
+
+    /* Write DATA: prefix in output buffer */
+    strncpy(outputBuffer, DATA_PREFIX, PREFIX_SIZE);
 
     /* Create named fifo. -1 means already exists so no action if already exists */
     if ( (returnCode = mknod(FIFO_NAME, S_IFIFO | 0666, 0) ) < -1 )
@@ -40,7 +47,7 @@ int main(void)
 	while (1)
 	{
         /* Get some text from console */
-		fgets(outputBuffer, BUFFER_SIZE, stdin);
+		fgets(outputBuffer + PREFIX_SIZE, BUFFER_SIZE, stdin);
         
         /* Write buffer to named fifo. Strlen - 1 to avoid sending \n char */
 		if ((bytesWrote = write(fd, outputBuffer, strlen(outputBuffer)-1)) == -1)
