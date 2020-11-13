@@ -1,0 +1,30 @@
+---
+:source:
+  :path: test
+  :file: test_leds.c
+:successes:
+- :test: test_LedsOffAfterCreate
+  :line: 24
+  :message: ''
+  :unity_test_time: 0
+- :test: test_prender_led_individual
+  :line: 30
+  :message: ''
+  :unity_test_time: 0
+- :test: test_apagar_led_individual
+  :line: 35
+  :message: ''
+  :unity_test_time: 0
+- :test: test_prender_led_invalido
+  :line: 42
+  :message: ''
+  :unity_test_time: 0
+:failures: []
+:ignores: []
+:counts:
+  :total: 4
+  :passed: 4
+  :failed: 0
+  :ignored: 0
+:stdout: []
+:time: 0.008521199997630902
