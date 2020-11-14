@@ -9,16 +9,16 @@
 #include <stdint.h>
 #include <signal.h>
 
-#define FIFO_NAME "myfifo"
-#define BUFFER_SIZE 300
+#define FIFO_NAME       "myfifo"
+#define BUFFER_SIZE     300
 
-#define DATA_PREFIX "DATA:"
-#define PREFIX_SIZE 5
+#define DATA_PREFIX     "DATA:"
+#define PREFIX_SIZE     5
 
-#define SIGN_1_MSG  "SIGN:1"
-#define SIGN_2_MSG  "SIGN:2"
+#define SIGN_1_MSG      "SIGN:1"
+#define SIGN_2_MSG      "SIGN:2"
 
-#define TOTAL_SIZE  300
+#define TOTAL_SIZE  (BUFFER_SIZE + PREFIX_SIZE)
 
 int32_t fd;
 
